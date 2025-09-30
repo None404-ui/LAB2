@@ -1,7 +1,7 @@
 package functions;
 
 /**
- * Класс для константной функции
+ * Класс для константной функции.
  */
 public class ConstantFunction implements MathFunction {
     private final double constant;

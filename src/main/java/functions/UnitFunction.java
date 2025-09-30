@@ -1,7 +1,7 @@
 package functions;
 
 /**
- * Класс для функции, всегда возвращающей 1
+ * Класс для функции, всегда возвращающей 1.
  */
 public class UnitFunction extends ConstantFunction {
     public UnitFunction() {
