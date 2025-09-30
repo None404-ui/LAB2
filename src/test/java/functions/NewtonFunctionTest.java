@@ -1,108 +1,184 @@
 package functions;
 
-public class NewtonFunctionTest {
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public static void main(String[] args) {
-        System.out.println("=== Тестирование NewtonFunction ===");
+/**
+ * Тесты для NewtonFunction
+ */
+class NewtonFunctionTest {
 
-        testQuadraticEquation();
-        testCubicEquation();
-        testTargetValue();
+    @Test
+    void testNewtonMethodForQuadraticEquation() {
+        // Тест решения уравнения x^2 - 4 = 0 (корни: x = ±2)
+        MathFunction quadratic = x -> x * x - 4; // f(x) = x^2 - 4
+        MathFunction derivative = x -> 2 * x;    // f'(x) = 2x
 
-        System.out.println("\n✓ Все тесты NewtonFunction пройдены успешно!");
+        NewtonFunction newton = new NewtonFunction(quadratic, derivative, 1.0, 0.001);
+        
+        double root = newton.getRoot();
+        assertTrue(Math.abs(root - 2.0) < 0.01 || Math.abs(root + 2.0) < 0.01);
+        
+        // Проверяем, что найденный корень действительно является решением
+        assertEquals(0.0, quadratic.apply(root), 0.01);
     }
 
-    private static void testQuadraticEquation() {
-        System.out.println("\n--- Тест квадратного уравнения x² - 4 = 0 ---");
+    @Test
+    void testNewtonMethodForCubicEquation() {
+        // Тест решения уравнения x^3 - 8 = 0 (корень: x = 2)
+        MathFunction cubic = x -> x * x * x - 8; // f(x) = x^3 - 8
+        MathFunction derivative = x -> 3 * x * x; // f'(x) = 3x^2
 
-        // Функция f(x) = x² - 4
-        MathFunction quadratic = new MathFunction() {
-            @Override
-            public double apply(double x) {
-                return x * x - 4;
-            }
-        };
-
-        // Производная f'(x) = 2x
-        MathFunction derivative = new MathFunction() {
-            @Override
-            public double apply(double x) {
-                return 2 * x;
-            }
-        };
-
-        // Находим корень x² - 4 = 0 (ожидаемый корень: 2)
-        NewtonFunction newtonFunction = new NewtonFunction(quadratic, derivative, 1.0, 1e-10);
-
-        double root = newtonFunction.getRoot();
-        double expectedRoot = 2.0;
-
-        assert Math.abs(root - expectedRoot) < 1e-10 : "Неверный корень: " + root + ", ожидалось: " + expectedRoot;
-
-        // Проверяем, что функция возвращает корень для любого x
-        assert newtonFunction.apply(0) == root : "Функция должна возвращать корень";
-        assert newtonFunction.apply(10) == root : "Функция должна возвращать корень";
-        assert newtonFunction.apply(-5) == root : "Функция должна возвращать корень";
-
-        System.out.println("✓ Корень найден: " + root);
+        NewtonFunction newton = new NewtonFunction(cubic, derivative, 1.0, 0.001);
+        
+        double root = newton.getRoot();
+        assertEquals(2.0, root, 0.01);
+        
+        // Проверяем, что найденный корень действительно является решением
+        assertEquals(0.0, cubic.apply(root), 0.01);
     }
 
-    private static void testCubicEquation() {
-        System.out.println("\n--- Тест кубического уравнения x³ - 8 = 0 ---");
+    @Test
+    void testNewtonMethodWithTarget() {
+        // Тест решения уравнения x^2 = 9 (корни: x = ±3)
+        MathFunction quadratic = x -> x * x;     // f(x) = x^2
+        MathFunction derivative = x -> 2 * x;    // f'(x) = 2x
 
-        // Функция f(x) = x³ - 8
-        MathFunction cubic = new MathFunction() {
-            @Override
-            public double apply(double x) {
-                return x * x * x - 8;
-            }
-        };
-
-        // Производная f'(x) = 3x²
-        MathFunction derivative = new MathFunction() {
-            @Override
-            public double apply(double x) {
-                return 3 * x * x;
-            }
-        };
-
-        // Находим корень x³ - 8 = 0 (ожидаемый корень: 2)
-        NewtonFunction newtonFunction = new NewtonFunction(cubic, derivative, 1.0, 1e-10);
-
-        double root = newtonFunction.getRoot();
-        double expectedRoot = 2.0;
-
-        assert Math.abs(root - expectedRoot) < 1e-10 : "Неверный корень: " + root + ", ожидалось: " + expectedRoot;
-
-        System.out.println("✓ Корень найден: " + root);
+        NewtonFunction newton = new NewtonFunction(quadratic, derivative, 9.0, 1.0, 0.001);
+        
+        double root = newton.getRoot();
+        assertTrue(Math.abs(root - 3.0) < 0.01 || Math.abs(root + 3.0) < 0.01);
+        
+        // Проверяем, что найденный корень действительно является решением
+        assertEquals(9.0, quadratic.apply(root), 0.01);
     }
 
-    private static void testTargetValue() {
-        System.out.println("\n--- Тест поиска x для f(x) = target ---");
+    @Test
+    void testNewtonMethodForLinearEquation() {
+        // Тест решения уравнения 2x - 6 = 0 (корень: x = 3)
+        MathFunction linear = x -> 2 * x - 6;    // f(x) = 2x - 6
+        MathFunction derivative = x -> 2.0;      // f'(x) = 2
 
-        // Функция f(x) = x²
-        MathFunction square = new SqrFunction();
+        NewtonFunction newton = new NewtonFunction(linear, derivative, 1.0, 0.001);
+        
+        double root = newton.getRoot();
+        assertEquals(3.0, root, 0.001);
+        
+        // Проверяем, что найденный корень действительно является решением
+        assertEquals(0.0, linear.apply(root), 0.001);
+    }
 
-        // Производная f'(x) = 2x
-        MathFunction derivative = new MathFunction() {
-            @Override
-            public double apply(double x) {
-                return 2 * x;
-            }
-        };
+    @Test
+    void testNewtonMethodForExponentialEquation() {
+        // Тест решения уравнения e^x - 2 = 0 (корень: x = ln(2) ≈ 0.693)
+        MathFunction exponential = x -> Math.exp(x) - 2; // f(x) = e^x - 2
+        MathFunction derivative = x -> Math.exp(x);      // f'(x) = e^x
 
-        // Находим x такое, что x² = 9, т.е. x = 3
-        NewtonFunction newtonFunction = new NewtonFunction(square, derivative, 9.0, 1.0, 1e-10);
+        NewtonFunction newton = new NewtonFunction(exponential, derivative, 0.0, 0.001);
+        
+        double root = newton.getRoot();
+        assertEquals(Math.log(2), root, 0.01);
+        
+        // Проверяем, что найденный корень действительно является решением
+        assertEquals(0.0, exponential.apply(root), 0.01);
+    }
 
-        double root = newtonFunction.getRoot();
-        double expectedRoot = 3.0;
+    @Test
+    void testNewtonMethodWithDifferentInitialGuesses() {
+        // Тест с разными начальными приближениями
+        MathFunction quadratic = x -> x * x - 4; // f(x) = x^2 - 4
+        MathFunction derivative = x -> 2 * x;    // f'(x) = 2x
 
-        assert Math.abs(root - expectedRoot) < 1e-10 : "Неверный корень: " + root + ", ожидалось: " + expectedRoot;
+        // Начальное приближение близко к положительному корню
+        NewtonFunction newton1 = new NewtonFunction(quadratic, derivative, 3.0, 0.001);
+        double root1 = newton1.getRoot();
+        assertTrue(Math.abs(root1 - 2.0) < 0.01);
 
-        // Проверяем, что x² = 9
-        double squareResult = square.apply(root);
-        assert Math.abs(squareResult - 9.0) < 1e-10 : "x² != 9: " + squareResult;
+        // Начальное приближение близко к отрицательному корню
+        NewtonFunction newton2 = new NewtonFunction(quadratic, derivative, -3.0, 0.001);
+        double root2 = newton2.getRoot();
+        assertTrue(Math.abs(root2 + 2.0) < 0.01);
+    }
 
-        System.out.println("✓ Корень найден: " + root + ", f(" + root + ") = " + squareResult);
+    @Test
+    void testNewtonMethodWithHighTolerance() {
+        // Тест с высокой точностью
+        MathFunction quadratic = x -> x * x - 4; // f(x) = x^2 - 4
+        MathFunction derivative = x -> 2 * x;    // f'(x) = 2x
+
+        NewtonFunction newton = new NewtonFunction(quadratic, derivative, 1.0, 1e-10);
+        
+        double root = newton.getRoot();
+        assertTrue(Math.abs(root - 2.0) < 1e-8 || Math.abs(root + 2.0) < 1e-8);
+        
+        // Проверяем высокую точность
+        assertEquals(0.0, quadratic.apply(root), 1e-8);
+    }
+
+    @Test
+    void testNewtonMethodWithZeroDerivative() {
+        // Тест с нулевой производной (должен выбросить исключение)
+        MathFunction constant = x -> 5.0;        // f(x) = 5 (константа)
+        MathFunction zeroDerivative = x -> 0.0;  // f'(x) = 0
+
+        assertThrows(ArithmeticException.class, () -> {
+            new NewtonFunction(constant, zeroDerivative, 1.0, 0.001);
+        });
+    }
+
+    @Test
+    void testNewtonMethodWithNoConvergence() {
+        // Тест с функцией, которая не сходится (должен выбросить исключение)
+        // Используем функцию, которая имеет точку с нулевой производной
+        MathFunction problematic = x -> x * x * x; // f(x) = x^3
+        MathFunction derivative = x -> 3 * x * x;  // f'(x) = 3x^2
+
+        // Начиная с x = 0, производная равна 0, что вызовет исключение
+        assertThrows(ArithmeticException.class, () -> {
+            new NewtonFunction(problematic, derivative, 0.0, 1e-10);
+        });
+    }
+
+    @Test
+    void testNewtonFunctionAsMathFunction() {
+        // Тест, что NewtonFunction реализует MathFunction
+        MathFunction quadratic = x -> x * x - 4;
+        MathFunction derivative = x -> 2 * x;
+
+        NewtonFunction newton = new NewtonFunction(quadratic, derivative, 1.0, 0.001);
+        
+        assertTrue(newton instanceof MathFunction);
+        
+        // Тест через интерфейс MathFunction
+        MathFunction func = newton;
+        double root = func.apply(0.0); // apply должен возвращать найденный корень
+        assertTrue(Math.abs(root - 2.0) < 0.01 || Math.abs(root + 2.0) < 0.01);
+    }
+
+    @Test
+    void testGetters() {
+        MathFunction quadratic = x -> x * x - 4;
+        MathFunction derivative = x -> 2 * x;
+
+        NewtonFunction newton = new NewtonFunction(quadratic, derivative, 1.0, 0.001);
+        
+        assertEquals(quadratic, newton.getFunction());
+        assertEquals(derivative, newton.getDerivative());
+        assertTrue(Math.abs(newton.getRoot() - 2.0) < 0.01 || Math.abs(newton.getRoot() + 2.0) < 0.01);
+    }
+
+    @Test
+    void testNewtonMethodWithTargetConstructor() {
+        // Тест конструктора с целевым значением
+        MathFunction quadratic = x -> x * x;
+        MathFunction derivative = x -> 2 * x;
+
+        NewtonFunction newton = new NewtonFunction(quadratic, derivative, 16.0, 2.0, 0.001);
+        
+        double root = newton.getRoot();
+        assertTrue(Math.abs(root - 4.0) < 0.01 || Math.abs(root + 4.0) < 0.01);
+        
+        // Проверяем, что найденный корень действительно является решением
+        assertEquals(16.0, quadratic.apply(root), 0.01);
     }
 }

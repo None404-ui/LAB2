@@ -1,5 +1,5 @@
 package functions;
-
+//Класс для функции ДеБура
 
 public class DeBoorFunction implements MathFunction {
 
