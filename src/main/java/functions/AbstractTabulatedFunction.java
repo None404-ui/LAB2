@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Абстрактный класс для табулированных функций
  */
-public abstract class AbstractTabulatedFunction implements MathFunction {
+public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
 
     /**
@@ -14,31 +14,6 @@ public abstract class AbstractTabulatedFunction implements MathFunction {
     public int getCount() {
         return count;
     }
-
-    /**
-     * Возвращает значение x по индексу
-     */
-    public abstract double getX(int index);
-
-    /**
-     * Возвращает значение y по индексу
-     */
-    public abstract double getY(int index);
-
-    /**
-     * Устанавливает значение y по индексу
-     */
-    public abstract void setY(int index, double value);
-
-    /**
-     * Возвращает индекс x в таблице, -1 если не найден
-     */
-    public abstract int indexOfX(double x);
-
-    /**
-     * Возвращает индекс y в таблице, -1 если не найден
-     */
-    public abstract int indexOfY(double y);
 
     /**
      * Возвращает левую границу таблицы
