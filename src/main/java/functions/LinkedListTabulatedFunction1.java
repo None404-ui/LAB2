@@ -1,6 +1,6 @@
 package functions;
 
-public class LinkedListTabulatedFunction1 implements TabulatedFunction {
+public class LinkedListTabulatedFunction1 implements TabulatedFunction, Insertable, Removable {
 
     static class Node {
         public Node next;
@@ -101,6 +101,119 @@ public class LinkedListTabulatedFunction1 implements TabulatedFunction {
         System.out.println("Added node: x=" + x + ", y=" + y + ", count=" + count); // Для отладки
     }
 
+    // для 3 задания remove
+    @Override
+    public void remove(int index) {
+        // Проверка корректности индекса
+        if (index < 0 || index >= count) {
+            throw new IndexOutOfBoundsException(
+                    "Индекс " + index + " вне диапазона [0, " + (count - 1) + "]");
+        }
+
+        // Проверка минимального количества точек
+        if (count <= 2) {
+            throw new IllegalStateException(
+                    "Нельзя удалить элемент: функция должна содержать минимум 2 точки");
+        }
+
+        // Находим узел для удаления
+        Node nodeToRemove = getNode(index);
+
+        // Если удаляем единственный узел (невозможно из-за проверки выше)
+        if (count == 1) {
+            head = null;
+        } else {
+            // Связываем соседние узлы между собой
+            Node prevNode = nodeToRemove.prev;
+            Node nextNode = nodeToRemove.next;
+
+            prevNode.next = nextNode;
+            nextNode.prev = prevNode;
+
+            // Если удаляем голову, обновляем ссылку на голову
+            if (nodeToRemove == head) {
+                head = nextNode;
+            }
+        }
+
+        // Уменьшаем счетчик
+        count--;
+    }
+
+
+    //ДЛЯ 3 ЗАДАНИЯ
+    @Override
+    public void insert(double x, double y) {
+        // Если список пустой, просто добавляем узел
+        if (head == null) {
+            addNode(x, y);
+            return;
+        }
+
+        // Ищем позицию для вставки
+        Node current = head;
+        Node prev = head.prev; // последний узел
+
+        do {
+            if (current.x == x) {
+                // Если x уже существует, заменяем y
+                current.y = y;
+                return;
+            }
+
+            if (current.x > x) {
+                // Нашли позицию для вставки перед current
+                insertBefore(current, x, y);
+                return;
+            }
+
+            prev = current;
+            current = current.next;
+        } while (current != head);
+
+        // Если дошли до конца и не нашли позицию, вставляем в конец
+        insertAfter(prev, x, y);
+    }
+
+
+    private void insertBefore(Node node, double x, double y) {
+        Node newNode = new Node(x, y);
+
+        Node prevNode = node.prev;
+
+        // Связываем предыдущий узел с новым
+        prevNode.next = newNode;
+        newNode.prev = prevNode;
+
+        // Связываем новый узел с текущим
+        newNode.next = node;
+        node.prev = newNode;
+
+        // Если вставляем перед головой, обновляем голову
+        if (node == head) {
+            head = newNode;
+        }
+
+        count++;
+    }
+
+
+    private void insertAfter(Node node, double x, double y) {
+        Node newNode = new Node(x, y);
+
+        Node nextNode = node.next;
+
+        // Связываем текущий узел с новым
+        node.next = newNode;
+        newNode.prev = node;
+
+        // Связываем новый узел со следующим
+        newNode.next = nextNode;
+        nextNode.prev = newNode;
+
+        count++;
+    }
+// КОНЕЦ ДОБАВОК ДЛЯ 3 ЗАДАНИЯ
 
     @Override
     public int getCount() {
