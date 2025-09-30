@@ -115,5 +115,87 @@ public class ArrayTabulatedFunctionTest {
 
         System.out.println("✓ Метод apply() работает корректно");
     }
+
+    private static void testInsertMethod() {
+
+        // создаем начальную функцию с 3 точками
+        double[] xValues = {1.0, 3.0, 5.0};
+        double[] yValues = {1.0, 9.0, 25.0}; // y = x^2
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
+
+        // Вставка новой точки в середину
+        function.insert(2.0, 4.0);
+
+        assert function.getCount() == 4 ;
+        assert function.getX(1) == 2.0 ;
+        assert function.getY(1) == 4.0 ;
+
+        // Проверяем порядок x значений
+        assert function.getX(0) == 1.0 ;
+        assert function.getX(1) == 2.0;
+        assert function.getX(2) == 3.0 ;
+        assert function.getX(3) == 5.0 ;
+
+
+        // Вставка новой точки в начало
+        function.insert(0.0, 0.0);
+
+        assert function.getCount() == 5;
+        assert function.getX(0) == 0.0 ;
+        assert function.getY(0) == 0.0 ;
+
+
+        //  Вставка новой точки в конец
+        function.insert(6.0, 36.0);
+
+        assert function.getCount() == 6 ;
+        assert function.getX(5) == 6.0 ;
+        assert function.getY(5) == 36.0 ;
+
+
+        //  Обновление существующей точки (x уже есть в массиве)
+        int initialCount = function.getCount();
+        double initialY = function.getY(2); // y для x=3.0 должно быть 9.0
+
+        function.insert(3.0, 100.0); // Обновляем значение для существующего x
+
+        assert function.getCount() == initialCount ;
+        assert function.getY(2) == 100.0 ;
+        assert function.getY(2) != initialY ;
+
+
+        //  Проверка сохранения порядка после множественных вставок
+        double[] xValues2 = {1.0, 5.0};
+        double[] yValues2 = {1.0, 25.0};
+        ArrayTabulatedFunction function2 = new ArrayTabulatedFunction(xValues2, yValues2);
+
+        function2.insert(3.0, 9.0);
+        function2.insert(2.0, 4.0);
+        function2.insert(4.0, 16.0);
+
+        assert function2.getCount() == 5 : "Неверное количество точек после множественных вставок";
+
+        // Проверяем, что все x упорядочены по возрастанию
+        for (int i = 1; i < function2.getCount(); i++) {
+            assert function2.getX(i) > function2.getX(i - 1) :
+                    "Нарушен порядок x значений после множественных вставок: " +
+                            function2.getX(i - 1) + " >= " + function2.getX(i);
+        }
+
+        // Проверяем конкретные значения
+        assert function2.getX(0) == 1.0;
+        assert function2.getX(1) == 2.0 ;
+        assert function2.getX(2) == 3.0 ;
+        assert function2.getX(3) == 4.0 ;
+        assert function2.getX(4) == 5.0 ;
+
+        assert function2.getY(0) == 1.0 ;
+        assert function2.getY(1) == 4.0 ;
+        assert function2.getY(2) == 9.0 ;
+        assert function2.getY(3) == 16.0 ;
+        assert function2.getY(4) == 25.0 ;
+
+
+    }
 }
 

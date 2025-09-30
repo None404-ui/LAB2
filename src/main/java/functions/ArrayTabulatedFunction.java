@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * Табулированная функция на основе массивов
  */
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Removable {
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable {
     private double[] xValues;
     private double[] yValues;
 
@@ -182,4 +182,45 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yValues = newYValues;
         count--;
     }
+
+    @Override
+    public void insert(double x, double y) {
+        int existingIndex = indexOfX(x);
+        if (existingIndex != -1) {
+            // если x уже есть просто заменяем y и заканчиваем выполнение
+            yValues[existingIndex] = y;
+            return;
+        }
+
+        // если такого x нет создаем новые массивы большего размера
+        double[] newXValues = new double[count + 1];
+        double[] newYValues = new double[count + 1];
+
+
+        int insertIndex = 0;
+        while (insertIndex < count && xValues[insertIndex] < x) {
+            insertIndex++;
+        }
+
+
+        System.arraycopy(xValues, 0, newXValues, 0, insertIndex);
+        System.arraycopy(yValues, 0, newYValues, 0, insertIndex);
+
+        // вставляем новые значения
+        newXValues[insertIndex] = x;
+        newYValues[insertIndex] = y;
+
+
+        if (insertIndex < count) {
+            System.arraycopy(xValues, insertIndex, newXValues, insertIndex + 1, count - insertIndex);
+            System.arraycopy(yValues, insertIndex, newYValues, insertIndex + 1, count - insertIndex);
+        }
+
+        // обновляем поля
+        xValues = newXValues;
+        yValues = newYValues;
+        count++;
+    }
+
+
 }
