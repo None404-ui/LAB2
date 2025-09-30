@@ -284,7 +284,7 @@ public class LinkedListTabulatedFunction1 implements TabulatedFunction, Insertab
         return -1;
     }
 
-
+//
     @Override
     public double apply(double x) {
         if (count == 1) {
