@@ -1,85 +1,69 @@
 package functions;
 
-public class AndThenMethodTest {
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public static void main(String[] args) {
-        System.out.println("=== Тестирование метода andThen ===");
+/**
+ * Тесты для метода andThen
+ */
+class AndThenMethodTest {
 
-        // Создаем различные функции для тестов
+    @Test
+    void testSimpleComposition() {
         SqrFunction sqr = new SqrFunction();           // f(x) = x²
         ConstantFunction const5 = new ConstantFunction(5);  // g(x) = 5
-        UnitFunction unit = new UnitFunction();        // h(x) = 1
-        ZeroFunction zero = new ZeroFunction();        // z(x) = 0
-        ConstantFunction const2 = new ConstantFunction(2);  // k(x) = 2
-
-        testSimpleComposition(sqr, const5);
-        testChainComposition(sqr, const5, unit);
-        testLongChain(sqr, const2, unit, zero);
-        testDirectApplication();
-
-        System.out.println("\n✓ Все тесты метода andThen пройдены успешно!");
-    }
-
-    private static void testSimpleComposition(SqrFunction sqr, ConstantFunction const5) {
-        System.out.println("\n--- Тест простой композиции ---");
 
         // Тест: sqr.andThen(const5) должно давать: const5(sqr(x)) = const5(x²) = 5
         MathFunction composite1 = sqr.andThen(const5);
         double result1 = composite1.apply(3); // sqr(3) = 9, const5(9) = 5
-        assert result1 == 5.0 : "Ошибка: sqr.andThen(const5).apply(3) должно быть 5, получили " + result1;
-        System.out.println("✓ sqr.andThen(const5).apply(3) = " + result1);
+        assertEquals(5.0, result1, 0.001);
 
         // Тест: const5.andThen(sqr) должно давать: sqr(const5(x)) = sqr(5) = 25
         MathFunction composite2 = const5.andThen(sqr);
         double result2 = composite2.apply(10); // const5(10) = 5, sqr(5) = 25
-        assert result2 == 25.0 : "Ошибка: const5.andThen(sqr).apply(10) должно быть 25, получили " + result2;
-        System.out.println("✓ const5.andThen(sqr).apply(10) = " + result2);
-
-        System.out.println("✓ Простая композиция работает корректно");
+        assertEquals(25.0, result2, 0.001);
     }
 
-    private static void testChainComposition(SqrFunction sqr, ConstantFunction const5, UnitFunction unit) {
-        System.out.println("\n--- Тест цепочки из 3 функций ---");
+    @Test
+    void testChainComposition() {
+        SqrFunction sqr = new SqrFunction();           // f(x) = x²
+        ConstantFunction const5 = new ConstantFunction(5);  // g(x) = 5
+        UnitFunction unit = new UnitFunction();        // h(x) = 1
 
         // Тест: sqr.andThen(const5).andThen(unit) = unit(const5(sqr(x))) = unit(const5(x²)) = unit(5) = 1
         MathFunction composite = sqr.andThen(const5).andThen(unit);
         double result1 = composite.apply(7); // sqr(7) = 49, const5(49) = 5, unit(5) = 1
-        assert result1 == 1.0 : "Ошибка: цепочка должна вернуть 1, получили " + result1;
-        System.out.println("✓ sqr.andThen(const5).andThen(unit).apply(7) = " + result1);
+        assertEquals(1.0, result1, 0.001);
 
         // Тест с другим порядком: unit.andThen(sqr).andThen(const5)
         MathFunction composite2 = unit.andThen(sqr).andThen(const5);
         double result2 = composite2.apply(-5); // unit(-5) = 1, sqr(1) = 1, const5(1) = 5
-        assert result2 == 5.0 : "Ошибка: цепочка должна вернуть 5, получили " + result2;
-        System.out.println("✓ unit.andThen(sqr).andThen(const5).apply(-5) = " + result2);
-
-        System.out.println("✓ Цепочки из 3 функций работают корректно");
+        assertEquals(5.0, result2, 0.001);
     }
 
-    private static void testLongChain(SqrFunction sqr, ConstantFunction const2, UnitFunction unit, ZeroFunction zero) {
-        System.out.println("\n--- Тест длинной цепочки из 4 функций ---");
+    @Test
+    void testLongChain() {
+        SqrFunction sqr = new SqrFunction();           // f(x) = x²
+        ConstantFunction const2 = new ConstantFunction(2);  // g(x) = 2
+        UnitFunction unit = new UnitFunction();        // h(x) = 1
+        ZeroFunction zero = new ZeroFunction();        // z(x) = 0
 
         // Тест: const2.andThen(sqr).andThen(unit).andThen(zero)
         // const2(x) = 2, sqr(2) = 4, unit(4) = 1, zero(1) = 0
         MathFunction longChain = const2.andThen(sqr).andThen(unit).andThen(zero);
         double result = longChain.apply(999); // Независимо от входа, результат должен быть 0
-        assert result == 0.0 : "Ошибка: длинная цепочка должна вернуть 0, получили " + result;
-        System.out.println("✓ const2.andThen(sqr).andThen(unit).andThen(zero).apply(999) = " + result);
-
-        System.out.println("✓ Длинная цепочка работает корректно");
+        assertEquals(0.0, result, 0.001);
     }
 
-    private static void testDirectApplication() {
-        System.out.println("\n--- Тест прямого применения без создания переменной ---");
-
+    @Test
+    void testDirectApplication() {
         SqrFunction sqr = new SqrFunction();
         ConstantFunction const3 = new ConstantFunction(3);
 
         // Прямое применение: sqr.andThen(const3).apply(5)
         // sqr(5) = 25, const3(25) = 3
         double directResult = sqr.andThen(const3).apply(5);
-        assert directResult == 3.0 : "Ошибка: прямое применение должно вернуть 3, получили " + directResult;
-        System.out.println("✓ sqr.andThen(const3).apply(5) = " + directResult);
+        assertEquals(3.0, directResult, 0.001);
 
         // Более сложная прямая цепочка
         double complexResult = new SqrFunction()
@@ -87,9 +71,107 @@ public class AndThenMethodTest {
                 .andThen(new SqrFunction())
                 .apply(123);
         // sqr(123) = любое число, const10(число) = 10, sqr(10) = 100
-        assert complexResult == 100.0 : "Ошибка: сложная цепочка должна вернуть 100, получили " + complexResult;
-        System.out.println("✓ Сложная прямая цепочка: " + complexResult);
+        assertEquals(100.0, complexResult, 0.001);
+    }
 
-        System.out.println("✓ Прямое применение работает корректно");
+    @Test
+    void testWithIdentityFunction() {
+        IdentityFunction identity = new IdentityFunction();  // f(x) = x
+        SqrFunction sqr = new SqrFunction();                 // g(x) = x²
+
+        // identity.andThen(sqr) = sqr(identity(x)) = sqr(x) = x²
+        MathFunction composite = identity.andThen(sqr);
+        assertEquals(0.0, composite.apply(0.0), 0.001);
+        assertEquals(1.0, composite.apply(1.0), 0.001);
+        assertEquals(4.0, composite.apply(2.0), 0.001);
+        assertEquals(9.0, composite.apply(3.0), 0.001);
+
+        // sqr.andThen(identity) = identity(sqr(x)) = sqr(x) = x²
+        MathFunction composite2 = sqr.andThen(identity);
+        assertEquals(0.0, composite2.apply(0.0), 0.001);
+        assertEquals(1.0, composite2.apply(1.0), 0.001);
+        assertEquals(4.0, composite2.apply(2.0), 0.001);
+        assertEquals(9.0, composite2.apply(3.0), 0.001);
+    }
+
+    @Test
+    void testWithConstantFunctions() {
+        ConstantFunction const2 = new ConstantFunction(2);
+        ConstantFunction const3 = new ConstantFunction(3);
+
+        // const2.andThen(const3) = const3(const2(x)) = const3(2) = 3
+        MathFunction composite = const2.andThen(const3);
+        assertEquals(3.0, composite.apply(0.0), 0.001);
+        assertEquals(3.0, composite.apply(100.0), 0.001);
+        assertEquals(3.0, composite.apply(-50.0), 0.001);
+    }
+
+    @Test
+    void testWithZeroAndUnitFunctions() {
+        ZeroFunction zero = new ZeroFunction();
+        UnitFunction unit = new UnitFunction();
+
+        // zero.andThen(unit) = unit(zero(x)) = unit(0) = 1
+        MathFunction composite1 = zero.andThen(unit);
+        assertEquals(1.0, composite1.apply(0.0), 0.001);
+        assertEquals(1.0, composite1.apply(100.0), 0.001);
+
+        // unit.andThen(zero) = zero(unit(x)) = zero(1) = 0
+        MathFunction composite2 = unit.andThen(zero);
+        assertEquals(0.0, composite2.apply(0.0), 0.001);
+        assertEquals(0.0, composite2.apply(100.0), 0.001);
+    }
+
+    @Test
+    void testChainingWithDifferentTypes() {
+        IdentityFunction identity = new IdentityFunction();
+        SqrFunction sqr = new SqrFunction();
+        ConstantFunction const4 = new ConstantFunction(4);
+
+        // identity.andThen(sqr).andThen(const4) = const4(sqr(identity(x))) = const4(sqr(x)) = const4(x²) = 4
+        MathFunction composite = identity.andThen(sqr).andThen(const4);
+        assertEquals(4.0, composite.apply(0.0), 0.001);
+        assertEquals(4.0, composite.apply(1.0), 0.001);
+        assertEquals(4.0, composite.apply(2.0), 0.001);
+        assertEquals(4.0, composite.apply(3.0), 0.001);
+    }
+
+    @Test
+    void testReturnType() {
+        SqrFunction sqr = new SqrFunction();
+        ConstantFunction const5 = new ConstantFunction(5);
+
+        // andThen должен возвращать CompositeFunction
+        MathFunction composite = sqr.andThen(const5);
+        assertTrue(composite instanceof CompositeFunction);
+    }
+
+    @Test
+    void testNullParameter() {
+        SqrFunction sqr = new SqrFunction();
+
+        // andThen с null должно выбросить исключение
+        assertThrows(NullPointerException.class, () -> {
+            sqr.andThen(null);
+        });
+    }
+
+    @Test
+    void testComplexMathematicalChain() {
+        // Создаем сложную математическую цепочку: f(x) = ((x + 1)² - 1) * 2
+        MathFunction plusOne = x -> x + 1;
+        MathFunction sqr = new SqrFunction();
+        MathFunction minusOne = x -> x - 1;
+        MathFunction timesTwo = x -> x * 2;
+
+        MathFunction complexChain = plusOne
+                .andThen(sqr)
+                .andThen(minusOne)
+                .andThen(timesTwo);
+
+        // Проверяем несколько значений
+        assertEquals(0.0, complexChain.apply(0.0), 0.001);  // ((0+1)²-1)*2 = 0
+        assertEquals(6.0, complexChain.apply(1.0), 0.001);  // ((1+1)²-1)*2 = 6
+        assertEquals(16.0, complexChain.apply(2.0), 0.001); // ((2+1)²-1)*2 = 16
     }
 }

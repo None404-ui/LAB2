@@ -1,87 +1,79 @@
 package functions;
 
-public class TabulatedFunctionCombinationsTest {
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public static void main(String[] args) {
-        System.out.println("=== Тестирование комбинаций табулированных функций ===");
+/**
+ * Тесты для комбинаций табулированных функций
+ */
+class TabulatedFunctionCombinationsTest {
 
-        testTabulatedWithRegularFunction();
-        testTabulatedWithTabulatedFunction();
-        testComplexComposition();
+    @Test
+    void testArrayTabulatedFunctionWithIdentityFunction() {
+        IdentityFunction identity = new IdentityFunction();
+        ArrayTabulatedFunction tabulated = new ArrayTabulatedFunction(identity, 0.0, 4.0, 5);
 
-        System.out.println("\n✓ Все тесты комбинаций функций пройдены успешно!");
+        assertEquals(0.0, tabulated.apply(0.0), 0.001);
+        assertEquals(1.0, tabulated.apply(1.0), 0.001);
+        assertEquals(2.0, tabulated.apply(2.0), 0.001);
+        assertEquals(3.0, tabulated.apply(3.0), 0.001);
+        assertEquals(4.0, tabulated.apply(4.0), 0.001);
+        assertEquals(1.5, tabulated.apply(1.5), 0.001);
     }
 
-    private static void testTabulatedWithRegularFunction() {
-        System.out.println("\n--- Тест комбинации табулированной и обычной функции ---");
+    @Test
+    void testArrayTabulatedFunctionWithSqrFunction() {
+        SqrFunction sqr = new SqrFunction();
+        ArrayTabulatedFunction tabulated = new ArrayTabulatedFunction(sqr, 0.0, 4.0, 5);
 
-        // Создаем табулированную функцию y = x^2 на интервале [0, 4]
-        SqrFunction sqrFunction = new SqrFunction();
-        ArrayTabulatedFunction tabulatedSqr = new ArrayTabulatedFunction(sqrFunction, 0.0, 4.0, 5);
-
-        // Создаем константную функцию y = 2
-        ConstantFunction constFunction = new ConstantFunction(2.0);
-
-        // Композиция: const(sqr(x)) = 2 для всех x
-        MathFunction composition = tabulatedSqr.andThen(constFunction);
-
-        // Тестируем результат
-        assert composition.apply(0.0) == 2.0 : "Ошибка в композиции с x=0.0";
-        assert composition.apply(1.0) == 2.0 : "Ошибка в композиции с x=1.0";
-        assert composition.apply(2.0) == 2.0 : "Ошибка в композиции с x=2.0";
-        assert composition.apply(4.0) == 2.0 : "Ошибка в композиции с x=4.0";
-
-        System.out.println("✓ Комбинация табулированной и обычной функции работает корректно");
+        assertEquals(0.0, tabulated.apply(0.0), 0.001);
+        assertEquals(1.0, tabulated.apply(1.0), 0.001);
+        assertEquals(4.0, tabulated.apply(2.0), 0.001);
+        assertEquals(9.0, tabulated.apply(3.0), 0.001);
+        assertEquals(16.0, tabulated.apply(4.0), 0.001);
+        assertEquals(2.5, tabulated.apply(1.5), 0.001);
     }
 
-    private static void testTabulatedWithTabulatedFunction() {
-        System.out.println("\n--- Тест комбинации двух табулированных функций ---");
+    @Test
+    void testLinkedListTabulatedFunctionWithIdentityFunction() {
+        IdentityFunction identity = new IdentityFunction();
+        LinkedListTabulatedFunction tabulated = new LinkedListTabulatedFunction(identity, 0.0, 4.0, 5);
 
-        // Создаем первую табулированную функцию y = x^2
-        double[] x1 = {0.0, 1.0, 2.0, 3.0};
-        double[] y1 = {0.0, 1.0, 4.0, 9.0};
-        ArrayTabulatedFunction tabulatedSqr = new ArrayTabulatedFunction(x1, y1);
-
-        // Создаем вторую табулированную функцию y = x + 1
-        double[] x2 = {0.0, 1.0, 2.0, 3.0};
-        double[] y2 = {1.0, 2.0, 3.0, 4.0};
-        ArrayTabulatedFunction tabulatedPlus1 = new ArrayTabulatedFunction(x2, y2);
-
-        // Композиция: (x+1)^2
-        MathFunction composition = tabulatedSqr.andThen(tabulatedPlus1);
-
-        // Тестируем результат
-        assert Math.abs(composition.apply(0.0) - 1.0) < 0.001 : "Ошибка в композиции с x=0.0";
-        assert Math.abs(composition.apply(1.0) - 4.0) < 0.001 : "Ошибка в композиции с x=1.0";
-        assert Math.abs(composition.apply(2.0) - 9.0) < 0.001 : "Ошибка в композиции с x=2.0";
-
-        System.out.println("✓ Комбинация двух табулированных функций работает корректно");
+        assertEquals(0.0, tabulated.apply(0.0), 0.001);
+        assertEquals(1.0, tabulated.apply(1.0), 0.001);
+        assertEquals(2.0, tabulated.apply(2.0), 0.001);
+        assertEquals(3.0, tabulated.apply(3.0), 0.001);
+        assertEquals(4.0, tabulated.apply(4.0), 0.001);
+        assertEquals(1.5, tabulated.apply(1.5), 0.001);
     }
 
-    private static void testComplexComposition() {
-        System.out.println("\n--- Тест сложной композиции функций ---");
+    @Test
+    void testCompositeFunctionWithTabulatedFunctions() {
+        IdentityFunction identity = new IdentityFunction();
+        ArrayTabulatedFunction tabulated = new ArrayTabulatedFunction(identity, 0.0, 4.0, 5);
+        SqrFunction sqr = new SqrFunction();
 
-        // Создаем исходную функцию y = x^2
-        SqrFunction sqrFunction = new SqrFunction();
-        ArrayTabulatedFunction tabulatedSqr = new ArrayTabulatedFunction(sqrFunction, 0.0, 2.0, 3);
+        CompositeFunction composite = new CompositeFunction(tabulated, sqr);
 
-        // Создаем функцию y = x + 1
-        MathFunction plus1 = new MathFunction() {
-            @Override
-            public double apply(double x) {
-                return x + 1;
-            }
-        };
+        assertEquals(0.0, composite.apply(0.0), 0.001);
+        assertEquals(1.0, composite.apply(1.0), 0.001);
+        assertEquals(4.0, composite.apply(2.0), 0.001);
+        assertEquals(9.0, composite.apply(3.0), 0.001);
+        assertEquals(16.0, composite.apply(4.0), 0.001);
+    }
 
-        // Композиция: (x^2 + 1)
-        MathFunction composition = tabulatedSqr.andThen(plus1);
+    @Test
+    void testTabulatedFunctionWithAndThenMethod() {
+        IdentityFunction identity = new IdentityFunction();
+        ArrayTabulatedFunction tabulated = new ArrayTabulatedFunction(identity, 0.0, 4.0, 5);
+        SqrFunction sqr = new SqrFunction();
 
-        // Тестируем результат
-        assert Math.abs(composition.apply(0.0) - 1.0) < 0.001 : "Ошибка в композиции с x=0.0";
-        assert Math.abs(composition.apply(1.0) - 2.0) < 0.001 : "Ошибка в композиции с x=1.0";
-        assert Math.abs(composition.apply(2.0) - 5.0) < 0.001 : "Ошибка в композиции с x=2.0";
+        MathFunction composite = tabulated.andThen(sqr);
 
-        System.out.println("✓ Сложная композиция функций работает корректно");
+        assertEquals(0.0, composite.apply(0.0), 0.001);
+        assertEquals(1.0, composite.apply(1.0), 0.001);
+        assertEquals(4.0, composite.apply(2.0), 0.001);
+        assertEquals(9.0, composite.apply(3.0), 0.001);
+        assertEquals(16.0, composite.apply(4.0), 0.001);
     }
 }
-
