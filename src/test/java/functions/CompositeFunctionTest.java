@@ -2,7 +2,7 @@ package functions;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
+//Тесты для композитной функции
 class CompositeFunctionTest {
 
     @Test

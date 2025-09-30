@@ -1,7 +1,7 @@
 package functions;
 
 /**
- * Класс для композиции функций
+ * Класс для композиции функций.
  */
 public class CompositeFunction implements MathFunction {
     private final MathFunction firstFunction;

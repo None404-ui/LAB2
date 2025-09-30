@@ -2,7 +2,7 @@ package functions;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
+//дополнительные тесты для функции
 class CompositeFunctionExtraTest {
 
     @Test
