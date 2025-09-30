@@ -1,37 +1,109 @@
 package functions;
 
-public class SqrFunctionTest {
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public static void main(String[] args) {
-        System.out.println("=== Тестирование SqrFunction ===");
+/**
+ * Тесты для SqrFunction
+ */
+class SqrFunctionTest {
 
-        SqrFunction sqrFunction = new SqrFunction();
+    @Test
+    void testBasicSquaring() {
+        SqrFunction sqr = new SqrFunction();
 
-        // Тест 1: квадрат положительного числа
-        double result1 = sqrFunction.apply(5.0);
-        assert result1 == 25.0 : "Ошибка: квадрат 5 должен быть 25, получили " + result1;
-        System.out.println("✓ Тест 1 пройден: 5^2 = " + result1);
+        // Тест с положительными числами
+        assertEquals(0.0, sqr.apply(0.0), 0.001);
+        assertEquals(1.0, sqr.apply(1.0), 0.001);
+        assertEquals(4.0, sqr.apply(2.0), 0.001);
+        assertEquals(9.0, sqr.apply(3.0), 0.001);
+        assertEquals(16.0, sqr.apply(4.0), 0.001);
+        assertEquals(25.0, sqr.apply(5.0), 0.001);
+    }
 
-        // Тест 2: квадрат отрицательного числа
-        double result2 = sqrFunction.apply(-3.0);
-        assert result2 == 9.0 : "Ошибка: квадрат -3 должен быть 9, получили " + result2;
-        System.out.println("✓ Тест 2 пройден: (-3)^2 = " + result2);
+    @Test
+    void testNegativeNumbers() {
+        SqrFunction sqr = new SqrFunction();
 
-        // Тест 3: квадрат нуля
-        double result3 = sqrFunction.apply(0.0);
-        assert result3 == 0.0 : "Ошибка: квадрат 0 должен быть 0, получили " + result3;
-        System.out.println("✓ Тест 3 пройден: 0^2 = " + result3);
+        // Тест с отрицательными числами
+        assertEquals(1.0, sqr.apply(-1.0), 0.001);
+        assertEquals(4.0, sqr.apply(-2.0), 0.001);
+        assertEquals(9.0, sqr.apply(-3.0), 0.001);
+        assertEquals(16.0, sqr.apply(-4.0), 0.001);
+        assertEquals(25.0, sqr.apply(-5.0), 0.001);
+    }
 
-        // Тест 4: квадрат дробного числа
-        double result4 = sqrFunction.apply(2.5);
-        assert result4 == 6.25 : "Ошибка: квадрат 2.5 должен быть 6.25, получили " + result4;
-        System.out.println("✓ Тест 4 пройден: (2.5)^2 = " + result4);
+    @Test
+    void testDecimalNumbers() {
+        SqrFunction sqr = new SqrFunction();
 
-        // Тест 5: квадрат единицы
-        double result5 = sqrFunction.apply(1.0);
-        assert result5 == 1.0 : "Ошибка: квадрат 1 должен быть 1, получили " + result5;
-        System.out.println("✓ Тест 5 пройден: 1^2 = " + result5);
+        // Тест с десятичными числами
+        assertEquals(0.25, sqr.apply(0.5), 0.001);
+        assertEquals(0.25, sqr.apply(-0.5), 0.001);
+        assertEquals(2.25, sqr.apply(1.5), 0.001);
+        assertEquals(2.25, sqr.apply(-1.5), 0.001);
+        assertEquals(6.25, sqr.apply(2.5), 0.001);
+        assertEquals(6.25, sqr.apply(-2.5), 0.001);
+    }
 
-        System.out.println("\n✓ Все тесты SqrFunction пройдены успешно!");
+    @Test
+    void testLargeNumbers() {
+        SqrFunction sqr = new SqrFunction();
+
+        // Тест с большими числами
+        assertEquals(100.0, sqr.apply(10.0), 0.001);
+        assertEquals(100.0, sqr.apply(-10.0), 0.001);
+        assertEquals(10000.0, sqr.apply(100.0), 0.001);
+        assertEquals(10000.0, sqr.apply(-100.0), 0.001);
+    }
+
+    @Test
+    void testSmallNumbers() {
+        SqrFunction sqr = new SqrFunction();
+
+        // Тест с очень маленькими числами
+        assertEquals(0.01, sqr.apply(0.1), 0.001);
+        assertEquals(0.01, sqr.apply(-0.1), 0.001);
+        assertEquals(0.0001, sqr.apply(0.01), 0.001);
+        assertEquals(0.0001, sqr.apply(-0.01), 0.001);
+    }
+
+    @Test
+    void testSpecialValues() {
+        SqrFunction sqr = new SqrFunction();
+
+        // Тест с NaN
+        assertTrue(Double.isNaN(sqr.apply(Double.NaN)));
+
+        // Тест с бесконечностью
+        assertEquals(Double.POSITIVE_INFINITY, sqr.apply(Double.POSITIVE_INFINITY));
+        assertEquals(Double.POSITIVE_INFINITY, sqr.apply(Double.NEGATIVE_INFINITY));
+    }
+
+    @Test
+    void testMathFunctionInterface() {
+        SqrFunction sqr = new SqrFunction();
+
+        // Проверяем, что SqrFunction реализует MathFunction
+        assertTrue(sqr instanceof MathFunction);
+
+        // Тест через интерфейс
+        MathFunction func = sqr;
+        assertEquals(9.0, func.apply(3.0), 0.001);
+        assertEquals(16.0, func.apply(4.0), 0.001);
+    }
+
+    @Test
+    void testPrecision() {
+        SqrFunction sqr = new SqrFunction();
+
+        // Тест точности вычислений
+        double result = sqr.apply(Math.PI);
+        double expected = Math.PI * Math.PI;
+        assertEquals(expected, result, 1e-10);
+
+        double result2 = sqr.apply(Math.E);
+        double expected2 = Math.E * Math.E;
+        assertEquals(expected2, result2, 1e-10);
     }
 }

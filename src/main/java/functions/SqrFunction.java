@@ -1,7 +1,7 @@
 package functions;
 
 /**
- * Класс для вычисления квадрата числа
+ * Класс для вычисления квадрата числел
  */
 public class SqrFunction implements MathFunction {
     @Override
