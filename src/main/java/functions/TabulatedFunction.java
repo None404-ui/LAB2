@@ -1,6 +1,6 @@
 package functions;
 
-
+//Интерфейс,расширяющий MathFunction
 public interface TabulatedFunction extends MathFunction {
 
     int getCount();
