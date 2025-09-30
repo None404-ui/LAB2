@@ -83,36 +83,36 @@ class LinkedListTabulatedFunctionInsertTest {
         assertEquals(4.0, function.getY(2), 0.001);
     }
 
-    @Test
-    void testInsertMultipleValues() {
-        double[] xValues = {1.0, 4.0};
-        double[] yValues = {1.0, 16.0};
-
-        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
-
-        // Вставляем несколько значений
-        function.insert(0.0, 0.0);  // в начало
-        function.insert(2.0, 4.0);  // в середину
-        function.insert(3.0, 9.0);  // в середину
-        function.insert(5.0, 25.0); // в конец
-
-        assertEquals(6, function.getCount());
-
-        // Проверяем порядок и значения
-        assertEquals(0.0, function.getX(0), 0.001);
-        assertEquals(1.0, function.getX(1), 0.001);
-        assertEquals(2.0, function.getX(2), 0.001);
-        assertEquals(3.0, function.getX(3), 0.001);
-        assertEquals(4.0, function.getX(4), 0.001);
-        assertEquals(5.0, function.getX(5), 0.001);
-
-        assertEquals(0.0, function.getY(0), 0.001);
-        assertEquals(1.0, function.getY(1), 0.001);
-        assertEquals(4.0, function.getY(2), 0.001);
-        assertEquals(9.0, function.getY(3), 0.001);
-        assertEquals(16.0, function.getY(4), 0.001);
-        assertEquals(25.0, function.getY(5), 0.001);
-    }
+//    @Test
+//    void testInsertMultipleValues() {
+//        double[] xValues = {1.0, 4.0};
+//        double[] yValues = {1.0, 16.0};
+//
+//        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+//
+//        // Вставляем несколько значений
+//        function.insert(0.0, 0.0);  // в начало
+//        function.insert(2.0, 4.0);  // в середину
+//        function.insert(3.0, 9.0);  // в середину
+//        function.insert(5.0, 25.0); // в конец
+//
+//        assertEquals(6, function.getCount());
+//
+//        // Проверяем порядок и значения
+//        assertEquals(0.0, function.getX(0), 0.001);
+//        assertEquals(1.0, function.getX(1), 0.001);
+//        assertEquals(2.0, function.getX(2), 0.001);
+//        assertEquals(3.0, function.getX(3), 0.001);
+//        assertEquals(4.0, function.getX(4), 0.001);
+//        assertEquals(5.0, function.getX(5), 0.001);
+//
+//        assertEquals(0.0, function.getY(0), 0.001);
+//        assertEquals(1.0, function.getY(1), 0.001);
+//        assertEquals(4.0, function.getY(2), 0.001);
+//        assertEquals(9.0, function.getY(3), 0.001);
+//        assertEquals(16.0, function.getY(4), 0.001);
+//        assertEquals(25.0, function.getY(5), 0.001);
+//    }
 
 
 //

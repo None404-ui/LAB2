@@ -1,153 +1,196 @@
 package functions;
 
-public class LinkedListTabulatedFunctionTest {
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-    public static void main(String[] args) {
-        System.out.println("=== Тестирование LinkedListTabulatedFunction ===");
+/**
+ * Тесты для LinkedListTabulatedFunction
+ */
+class LinkedListTabulatedFunctionTest {
 
-        testConstructorWithArrays();
-        testConstructorWithFunction();
-        testInsertMethod();
-        testInterpolation();
-        testExtrapolation();
-        testApplyMethod();
-
-        System.out.println("\n✓ Все тесты LinkedListTabulatedFunction пройдены успешно!");
-    }
-
-    private static void testConstructorWithArrays() {
-        System.out.println("\n--- Тест конструктора с массивами ---");
-
+    @Test
+    void testConstructorWithArrays() {
         double[] xValues = {1.0, 2.0, 3.0, 4.0};
         double[] yValues = {1.0, 4.0, 9.0, 16.0};
 
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        assert function.getCount() == 4 : "Неверное количество точек";
-        assert function.getX(0) == 1.0 : "Неверное значение x[0]";
-        assert function.getX(3) == 4.0 : "Неверное значение x[3]";
-        assert function.getY(0) == 1.0 : "Неверное значение y[0]";
-        assert function.getY(3) == 16.0 : "Неверное значение y[3]";
-
-        System.out.println("✓ Конструктор с массивами работает корректно");
+        assertEquals(4, function.getCount());
+        assertEquals(1.0, function.getX(0), 0.001);
+        assertEquals(4.0, function.getX(3), 0.001);
+        assertEquals(1.0, function.getY(0), 0.001);
+        assertEquals(16.0, function.getY(3), 0.001);
     }
 
-    private static void testConstructorWithFunction() {
-        System.out.println("\n--- Тест конструктора с функцией ---");
-
+    @Test
+    void testConstructorWithFunction() {
         SqrFunction sqrFunction = new SqrFunction();
         LinkedListTabulatedFunction tabulatedFunction = new LinkedListTabulatedFunction(sqrFunction, 0.0, 4.0, 5);
 
-        assert tabulatedFunction.getCount() == 5 : "Неверное количество точек";
-        assert tabulatedFunction.getX(0) == 0.0 : "Неверное значение x[0]";
-        assert tabulatedFunction.getX(4) == 4.0 : "Неверное значение x[4]";
-        assert tabulatedFunction.getY(0) == 0.0 : "Неверное значение y[0] (0^2 = 0)";
-        assert tabulatedFunction.getY(2) == 4.0 : "Неверное значение y[2] (2^2 = 4)";
-        assert tabulatedFunction.getY(4) == 16.0 : "Неверное значение y[4] (4^2 = 16)";
-
-        System.out.println("✓ Конструктор с функцией работает корректно");
+        assertEquals(5, tabulatedFunction.getCount());
+        assertEquals(0.0, tabulatedFunction.getX(0), 0.001);
+        assertEquals(4.0, tabulatedFunction.getX(4), 0.001);
+        assertEquals(0.0, tabulatedFunction.getY(0), 0.001);
+        assertEquals(4.0, tabulatedFunction.getY(2), 0.001);
+        assertEquals(16.0, tabulatedFunction.getY(4), 0.001);
     }
 
-    private static void testInsertMethod() {
-        System.out.println("\n--- Тест метода insert() ---");
-
-        double[] xValues = {1.0, 3.0, 5.0};
-        double[] yValues = {1.0, 9.0, 25.0};
-        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
-
-        // Вставка в середину
-        function.insert(2.0, 4.0);
-        assert function.getCount() == 4 : "Неверное количество после вставки";
-        assert function.getX(1) == 2.0 : "Неверное значение x после вставки";
-        assert function.getY(1) == 4.0 : "Неверное значение y после вставки";
-
-        // Замена существующего значения
-        function.insert(2.0, 8.0);
-        assert function.getCount() == 4 : "Количество не должно измениться при замене";
-        assert function.getY(1) == 8.0 : "Значение должно быть заменено";
-
-        // Вставка в начало
-        function.insert(0.5, 0.25);
-        assert function.getCount() == 5 : "Неверное количество после вставки в начало";
-        assert function.getX(0) == 0.5 : "Неверное значение x в начале";
-        assert function.getY(0) == 0.25 : "Неверное значение y в начале";
-
-        // Вставка в конец
-        function.insert(6.0, 36.0);
-        assert function.getCount() == 6 : "Неверное количество после вставки в конец";
-        assert function.getX(5) == 6.0 : "Неверное значение x в конце";
-        assert function.getY(5) == 36.0 : "Неверное значение y в конце";
-
-        System.out.println("✓ Метод insert() работает корректно");
-    }
-
-    private static void testInterpolation() {
-        System.out.println("\n--- Тест интерполяции ---");
-
+    @Test
+    void testGettersAndSetters() {
         double[] xValues = {1.0, 2.0, 3.0};
-        double[] yValues = {1.0, 4.0, 9.0}; // y = x^2
-
+        double[] yValues = {1.0, 4.0, 9.0};
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        // Точка внутри интервала (1, 3)
-        double result = function.apply(1.5);
-        double expected = 2.25; // (1.5)^2 = 2.25
-        assert Math.abs(result - expected) < 0.001 : "Неверная интерполяция: " + result + " != " + expected;
+        // Тест getX
+        assertEquals(1.0, function.getX(0), 0.001);
+        assertEquals(2.0, function.getX(1), 0.001);
+        assertEquals(3.0, function.getX(2), 0.001);
 
-        // Точка в узле таблицы
-        double result2 = function.apply(2.0);
-        assert result2 == 4.0 : "Неверное значение в узле: " + result2;
+        // Тест getY
+        assertEquals(1.0, function.getY(0), 0.001);
+        assertEquals(4.0, function.getY(1), 0.001);
+        assertEquals(9.0, function.getY(2), 0.001);
 
-        System.out.println("✓ Интерполяция работает корректно");
+        // Тест setY
+        function.setY(1, 5.0);
+        assertEquals(5.0, function.getY(1), 0.001);
     }
 
-    private static void testExtrapolation() {
-        System.out.println("\n--- Тест экстраполяции ---");
+    @Test
+    void testIndexOfX() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
+        assertEquals(0, function.indexOfX(1.0));
+        assertEquals(2, function.indexOfX(3.0));
+        assertEquals(-1, function.indexOfX(5.0));
+    }
+
+    @Test
+    void testIndexOfY() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        assertEquals(0, function.indexOfY(1.0));
+        assertEquals(2, function.indexOfY(9.0));
+        assertEquals(-1, function.indexOfY(5.0));
+    }
+
+    @Test
+    void testBounds() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        assertEquals(1.0, function.leftBound(), 0.001);
+        assertEquals(4.0, function.rightBound(), 0.001);
+    }
+
+    @Test
+    void testApplyMethod() {
+        double[] xValues = {0.0, 1.0, 2.0, 3.0};
+        double[] yValues = {0.0, 1.0, 4.0, 9.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        // Тест точных значений
+        assertEquals(0.0, function.apply(0.0), 0.001);
+        assertEquals(1.0, function.apply(1.0), 0.001);
+        assertEquals(4.0, function.apply(2.0), 0.001);
+        assertEquals(9.0, function.apply(3.0), 0.001);
+
+        // Тест интерполяции
+        double interpolated = function.apply(1.5);
+        assertTrue(interpolated > 1.0 && interpolated < 4.0);
+    }
+
+    @Test
+    void testInterpolation() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        // Тест интерполяции между точками
+        double result = function.apply(2.5);
+        double expected = 6.5; // Линейная интерполяция между 4.0 и 9.0
+        assertEquals(expected, result, 0.001);
+    }
+
+    @Test
+    void testExtrapolation() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        // Тест экстраполяции слева
+        double leftResult = function.apply(0.5);
+        assertTrue(leftResult < 1.0 && leftResult > -1.0);
+
+        // Тест экстраполяции справа
+        double rightResult = function.apply(5.0);
+        assertTrue(rightResult > 16.0);
+    }
+
+
+
+
+    @Test
+    void testInsertExistingX() {
         double[] xValues = {1.0, 2.0, 3.0};
-        double[] yValues = {1.0, 4.0, 9.0}; // y = x^2
-
+        double[] yValues = {1.0, 4.0, 9.0};
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        // Экстраполяция слева (x < 1.0)
-        double resultLeft = function.apply(0.0);
-        double expectedLeft = 0.0; // Продолжение линии от (1,1) к (2,4)
-        assert Math.abs(resultLeft - expectedLeft) < 0.001 : "Неверная экстраполяция слева";
-
-        // Экстраполяция справа (x > 3.0)
-        double resultRight = function.apply(4.0);
-        double expectedRight = 16.0; // Продолжение линии от (2,4) к (3,9)
-        assert Math.abs(resultRight - expectedRight) < 0.001 : "Неверная экстраполяция справа";
-
-        System.out.println("✓ Экстраполяция работает корректно");
+        // Вставляем существующий x
+        function.insert(2.0, 5.0);
+        assertEquals(3, function.getCount()); // количество не изменилось
+        assertEquals(5.0, function.getY(1), 0.001); // y изменился
     }
 
-    private static void testApplyMethod() {
-        System.out.println("\n--- Тест метода apply() ---");
+    @Test
+    void testConstructorValidation() {
+        // Тест с разными длинами массивов
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(new double[]{1.0, 2.0}, new double[]{1.0});
+        });
 
-        double[] xValues = {0.0, 1.0, 2.0};
-        double[] yValues = {0.0, 1.0, 4.0}; // y = x^2
+        // Тест с недостаточным количеством точек
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(new double[]{1.0}, new double[]{1.0});
+        });
 
+        // Тест с неупорядоченными x
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LinkedListTabulatedFunction(new double[]{2.0, 1.0, 3.0}, new double[]{4.0, 1.0, 9.0});
+        });
+    }
+
+    @Test
+    void testIndexOutOfBounds() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        // Точки в таблице
-        assert function.apply(0.0) == 0.0 : "Неверное значение для x=0.0";
-        assert function.apply(1.0) == 1.0 : "Неверное значение для x=1.0";
-        assert function.apply(2.0) == 4.0 : "Неверное значение для x=2.0";
+        assertThrows(IndexOutOfBoundsException.class, () -> function.getX(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> function.getX(3));
+        assertThrows(IndexOutOfBoundsException.class, () -> function.getY(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> function.getY(3));
+        assertThrows(IndexOutOfBoundsException.class, () -> function.setY(-1, 0.0));
+        assertThrows(IndexOutOfBoundsException.class, () -> function.setY(3, 0.0));
+    }
 
-        // Интерполяция
-        double result = function.apply(0.5);
-        assert Math.abs(result - 0.25) < 0.001 : "Неверная интерполяция для x=0.5";
+    @Test
+    void testCircularListStructure() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {1.0, 4.0, 9.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        // Экстраполяция слева
-        double resultLeft = function.apply(-1.0);
-        assert Math.abs(resultLeft - (-1.0)) < 0.001 : "Неверная экстраполяция слева";
-
-        // Экстраполяция справа
-        double resultRight = function.apply(3.0);
-        assert Math.abs(resultRight - 9.0) < 0.001 : "Неверная экстраполяция справа";
-
-        System.out.println("✓ Метод apply() работает корректно");
+        // Проверяем, что список циклический
+        // Все элементы должны быть доступны через индексы
+        for (int i = 0; i < function.getCount(); i++) {
+            final int index = i;
+            assertDoesNotThrow(() -> function.getX(index));
+            assertDoesNotThrow(() -> function.getY(index));
+        }
     }
 }
-

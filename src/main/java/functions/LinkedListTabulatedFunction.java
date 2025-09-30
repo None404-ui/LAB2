@@ -3,10 +3,10 @@ package functions;
 /**
  * Табулированная функция на основе связного списка
  */
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable {
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable {
 
     private Node head;
-    private Node tail;
+    // count наследуется от AbstractTabulatedFunction
 
     /**
      * Узел связного списка
@@ -43,18 +43,20 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             }
         }
 
-        // Создаем связный список
+        // Создаем циклический двусвязный список
         head = new Node(xValues[0], yValues[0]);
-        Node current = head;
+        head.next = head;
+        head.prev = head;
 
         for (int i = 1; i < count; i++) {
             Node newNode = new Node(xValues[i], yValues[i]);
-            current.next = newNode;
-            newNode.prev = current;
-            current = newNode;
+            Node last = head.prev;
+            
+            last.next = newNode;
+            newNode.prev = last;
+            newNode.next = head;
+            head.prev = newNode;
         }
-
-        tail = current;
     }
 
     /**
@@ -77,20 +79,22 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         // Заполняем xValues равномерно
         double step = (xTo - xFrom) / (count - 1);
 
-        // Создаем связный список
+        // Создаем циклический двусвязный список
         head = new Node(xFrom, source.apply(xFrom));
-        Node current = head;
+        head.next = head;
+        head.prev = head;
 
         for (int i = 1; i < count; i++) {
             double x = xFrom + i * step;
             double y = source.apply(x);
             Node newNode = new Node(x, y);
-            current.next = newNode;
-            newNode.prev = current;
-            current = newNode;
+            Node last = head.prev;
+            
+            last.next = newNode;
+            newNode.prev = last;
+            newNode.next = head;
+            head.prev = newNode;
         }
-
-        tail = current;
     }
 
     @Override
@@ -134,49 +138,63 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public int indexOfX(double x) {
+        if (head == null) {
+            return -1;
+        }
+
         Node current = head;
         int index = 0;
-        while (current != null) {
+
+        do {
             if (current.x == x) {
                 return index;
             }
             current = current.next;
             index++;
-        }
+        } while (current != head);
+
         return -1;
     }
 
     @Override
     public int indexOfY(double y) {
+        if (head == null) {
+            return -1;
+        }
+
         Node current = head;
         int index = 0;
-        while (current != null) {
+
+        do {
             if (current.y == y) {
                 return index;
             }
             current = current.next;
             index++;
-        }
+        } while (current != head);
+
         return -1;
     }
 
     @Override
     protected int floorIndexOfX(double x) {
+        if (head == null) {
+            return 0;
+        }
+
         if (x < head.x) {
             return 0;
         }
 
         Node current = head;
         int index = 0;
-        while (current.next != null) {
-            if (current.x <= x && current.next.x > x) {
-                return index;
-            }
+
+        while (current.next != head && current.next.x <= x) {
             current = current.next;
             index++;
         }
 
-        return count;
+        return index;
     }
 
     @Override
@@ -190,9 +208,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     protected double extrapolateRight(double x) {
         if (count == 1) {
-            return tail.y;
+            return head.y;
         }
-        return interpolate(x, tail.prev.x, tail.x, tail.prev.y, tail.y);
+        Node last = head.prev;
+        return interpolate(x, last.prev.x, last.x, last.prev.y, last.y);
     }
 
     @Override
@@ -223,11 +242,15 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     private void addNode(double x, double y) {
         Node newNode = new Node(x, y);
         if (head == null) {
-            head = tail = newNode;
+            head = newNode;
+            head.next = head;
+            head.prev = head;
         } else {
-            tail.next = newNode;
-            newNode.prev = tail;
-            tail = newNode;
+            Node last = head.prev;
+            last.next = newNode;
+            newNode.prev = last;
+            newNode.next = head;
+            head.prev = newNode;
         }
         count++;
     }
@@ -262,7 +285,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         }
 
         // Ищем место для вставки в середину или конец
-        while (current.next != null && current.next.x < x) {
+        while (current.next != head && current.next.x < x) {
             current = current.next;
             index++;
         }
@@ -271,15 +294,36 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         Node newNode = new Node(x, y);
         newNode.next = current.next;
         newNode.prev = current;
-
-        if (current.next != null) {
-            current.next.prev = newNode;
-        } else {
-            tail = newNode;
-        }
-
+        current.next.prev = newNode;
         current.next = newNode;
         count++;
+    }
+
+    @Override
+    public void remove(int index) {
+        if (index < 0 || index >= count) {
+            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+        }
+        if (count <= 2) {
+            throw new IllegalStateException("Нельзя удалить элемент из функции с менее чем 2 точками");
+        }
+
+        // Находим узел для удаления
+        Node nodeToRemove = head;
+        for (int i = 0; i < index; i++) {
+            nodeToRemove = nodeToRemove.next;
+        }
+
+        // Если удаляем голову
+        if (nodeToRemove == head) {
+            head = head.next;
+        }
+        
+        // Связываем соседние узлы
+        nodeToRemove.prev.next = nodeToRemove.next;
+        nodeToRemove.next.prev = nodeToRemove.prev;
+
+        count--;
     }
 }
 
