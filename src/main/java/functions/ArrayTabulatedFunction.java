@@ -3,7 +3,7 @@ package functions;
 import java.util.Arrays;
 
 /**
- * Табулированная функция на основе массивов
+ * Табулированная функция на основе массивов.
  */
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable {
     private double[] xValues;
