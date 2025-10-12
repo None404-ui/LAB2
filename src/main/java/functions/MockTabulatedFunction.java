@@ -1,5 +1,8 @@
 package functions;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * Mock-класс для тестирования абстрактных методов AbstractTabulatedFunction
  */
@@ -87,5 +90,27 @@ public class MockTabulatedFunction extends AbstractTabulatedFunction {
         } else {
             return interpolate(x, x0, x1, y0, y1);
         }
+    }
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                Point point = new Point(getX(i), getY(i));
+                i++;
+                return point;
+            }
+        };
     }
 }
