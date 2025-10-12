@@ -2,10 +2,15 @@ package io;
 
 import functions.Point;
 import functions.TabulatedFunction;
+import functions.factory.TabulatedFunctionFactory;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 /**
  * Класс для ввода/вывода табулированных функций
@@ -37,6 +42,37 @@ public final class FunctionsIO {
         }
         
         printWriter.flush();
+    }
+
+    /**
+     * Читает табулированную функцию из буферизованного символьного потока
+     * @param reader буферизованный поток чтения
+     * @param factory фабрика для создания функции
+     * @return табулированная функция
+     * @throws IOException если произошла ошибка ввода-вывода
+     */
+    public static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory) throws IOException {
+        String line = reader.readLine();
+        int count = Integer.parseInt(line);
+        
+        double[] xValues = new double[count];
+        double[] yValues = new double[count];
+        
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.forLanguageTag("ru"));
+        
+        for (int i = 0; i < count; i++) {
+            line = reader.readLine();
+            String[] values = line.split(" ");
+            
+            try {
+                xValues[i] = numberFormat.parse(values[0]).doubleValue();
+                yValues[i] = numberFormat.parse(values[1]).doubleValue();
+            } catch (ParseException e) {
+                throw new IOException(e);
+            }
+        }
+        
+        return factory.create(xValues, yValues);
     }
 }
 
