@@ -57,7 +57,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     public double getX(int index) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
         return xValues[index];
     }
@@ -65,7 +65,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     public double getY(int index) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
         return yValues[index];
     }
@@ -73,7 +73,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     public void setY(int index, double value) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
         yValues[index] = value;
     }
@@ -101,7 +101,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     protected int floorIndexOfX(double x) {
         if (x < xValues[0]) {
-            return 0;
+            throw new IllegalArgumentException("x = " + x + " меньше левой границы " + xValues[0]);
         }
 
         for (int i = 1; i < count; i++) {
@@ -115,17 +115,11 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) {
-            return yValues[0];
-        }
         return interpolate(x, xValues[0], xValues[1], yValues[0], yValues[1]);
     }
 
     @Override
     protected double extrapolateRight(double x) {
-        if (count == 1) {
-            return yValues[0];
-        }
         int lastIndex = count - 1;
         return interpolate(x, xValues[lastIndex - 1], xValues[lastIndex],
                           yValues[lastIndex - 1], yValues[lastIndex]);
@@ -133,6 +127,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected double interpolate(double x, int floorIndex) {
+        if (floorIndex < 0 || floorIndex >= count) {
+            throw new IllegalArgumentException("Некорректный floorIndex: " + floorIndex);
+        }
+
         if (floorIndex == count) {
             return extrapolateRight(x);
         }
@@ -157,7 +155,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override
     public void remove(int index) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
         if (count <= 2) {
             throw new IllegalStateException("Нельзя удалить элемент из функции с менее чем 2 точками");

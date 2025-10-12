@@ -2,6 +2,8 @@ package functions;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import exceptions.DifferentLengthOfArraysException;
+import exceptions.ArrayIsNotSortedException;
 
 /**
  * Тесты для LinkedListTabulatedFunction
@@ -150,7 +152,7 @@ class LinkedListTabulatedFunctionTest {
     @Test
     void testConstructorValidation() {
         // Тест с разными длинами массивов
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(DifferentLengthOfArraysException.class, () -> {
             new LinkedListTabulatedFunction(new double[]{1.0, 2.0}, new double[]{1.0});
         });
 
@@ -159,8 +161,8 @@ class LinkedListTabulatedFunctionTest {
             new LinkedListTabulatedFunction(new double[]{1.0}, new double[]{1.0});
         });
 
-        // Тест с неупорядоченными x
-        assertThrows(IllegalArgumentException.class, () -> {
+        // Тест с неупорядоченными x - исправляем ожидаемое исключение
+        assertThrows(ArrayIsNotSortedException.class, () -> {
             new LinkedListTabulatedFunction(new double[]{2.0, 1.0, 3.0}, new double[]{4.0, 1.0, 9.0});
         });
     }
@@ -171,12 +173,12 @@ class LinkedListTabulatedFunctionTest {
         double[] yValues = {1.0, 4.0, 9.0};
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getX(-1));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getX(3));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getY(-1));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getY(3));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.setY(-1, 0.0));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.setY(3, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> function.getX(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.getX(3));
+        assertThrows(IllegalArgumentException.class, () -> function.getY(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.getY(3));
+        assertThrows(IllegalArgumentException.class, () -> function.setY(-1, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> function.setY(3, 0.0));
     }
 
     @Test
@@ -193,6 +195,24 @@ class LinkedListTabulatedFunctionTest {
             assertDoesNotThrow(() -> function.getY(index));
         }
     }
+
+    @Test
+    void testLinkedListGetXWithInvalidIndex() {
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0}, new double[]{1.0, 4.0});
+
+        assertThrows(IllegalArgumentException.class, () -> function.getX(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.getX(2));
+    }
+
+    @Test
+    void testLinkedListFloorIndexOfXWithSmallX() {
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0}, new double[]{1.0, 4.0});
+
+        assertThrows(IllegalArgumentException.class, () -> function.floorIndexOfX(0.5));
+    }
+
 }
 
 

@@ -2,6 +2,8 @@ package functions;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import exceptions.DifferentLengthOfArraysException;
+import exceptions.ArrayIsNotSortedException;
 
 /**
  * Тесты для ArrayTabulatedFunction
@@ -172,7 +174,7 @@ class ArrayTabulatedFunctionTest {
     @Test
     void testConstructorValidation() {
         // Тест с разными длинами массивов
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(DifferentLengthOfArraysException.class, () -> {
             new ArrayTabulatedFunction(new double[]{1.0, 2.0}, new double[]{1.0});
         });
 
@@ -182,7 +184,7 @@ class ArrayTabulatedFunctionTest {
         });
 
         // Тест с неупорядоченными x
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(ArrayIsNotSortedException.class, () -> {
             new ArrayTabulatedFunction(new double[]{2.0, 1.0, 3.0}, new double[]{4.0, 1.0, 9.0});
         });
     }
@@ -193,12 +195,12 @@ class ArrayTabulatedFunctionTest {
         double[] yValues = {1.0, 4.0, 9.0};
         ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
 
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getX(-1));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getX(3));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getY(-1));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.getY(3));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.setY(-1, 0.0));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.setY(3, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> function.getX(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.getX(3));
+        assertThrows(IllegalArgumentException.class, () -> function.getY(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.getY(3));
+        assertThrows(IllegalArgumentException.class, () -> function.setY(-1, 0.0));
+        assertThrows(IllegalArgumentException.class, () -> function.setY(3, 0.0));
     }
 
     @Test
@@ -359,6 +361,31 @@ class ArrayTabulatedFunctionTest {
         assertEquals(2.0, function.getX(1), 0.001);
         assertEquals(3.0, function.getX(2), 0.001);
     }
+
+    @Test
+    void testConstructorWithOnePoint() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new ArrayTabulatedFunction(new double[]{1.0}, new double[]{2.0});
+        });
+    }
+
+    @Test
+    void testGetXWithInvalidIndex() {
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(
+                new double[]{1.0, 2.0}, new double[]{1.0, 4.0});
+
+        assertThrows(IllegalArgumentException.class, () -> function.getX(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.getX(2));
+    }
+
+    @Test
+    void testFloorIndexOfXWithSmallX() {
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(
+                new double[]{1.0, 2.0}, new double[]{1.0, 4.0});
+
+        assertThrows(IllegalArgumentException.class, () -> function.floorIndexOfX(0.5));
+    }
+
 }
 
 

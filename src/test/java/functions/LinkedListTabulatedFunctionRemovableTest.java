@@ -71,9 +71,9 @@ class LinkedListTabulatedFunctionRemovableTest {
         LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
         // Попытка удалить с недопустимым индексом
-        assertThrows(IndexOutOfBoundsException.class, () -> function.remove(-1));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.remove(3));
-        assertThrows(IndexOutOfBoundsException.class, () -> function.remove(10));
+        assertThrows(IllegalArgumentException.class, () -> function.remove(-1));
+        assertThrows(IllegalArgumentException.class, () -> function.remove(3));
+        assertThrows(IllegalArgumentException.class, () -> function.remove(10));
     }
 
     @Test

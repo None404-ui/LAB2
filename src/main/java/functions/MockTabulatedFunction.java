@@ -88,4 +88,13 @@ public class MockTabulatedFunction extends AbstractTabulatedFunction {
             return interpolate(x, x0, x1, y0, y1);
         }
     }
+
+    @Override
+    public java.util.Iterator<functions.Point> iterator() {
+        java.util.List<functions.Point> points = java.util.Arrays.asList(
+                new functions.Point(x0, y0),
+                new functions.Point(x1, y1)
+        );
+        return points.iterator();
+    }
 }

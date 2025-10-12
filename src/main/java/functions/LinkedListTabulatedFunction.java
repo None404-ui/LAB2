@@ -95,7 +95,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     public double getX(int index) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
 
         Node current = head;
@@ -108,7 +108,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     public double getY(int index) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
 
         Node current = head;
@@ -121,7 +121,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     public void setY(int index, double value) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
 
         Node current = head;
@@ -178,7 +178,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         }
 
         if (x < head.x) {
-            return 0;
+            throw new IllegalArgumentException("x = " + x + " меньше левой границы " + head.x);
         }
 
         Node current = head;
@@ -194,23 +194,21 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) {
-            return head.y;
-        }
         return interpolate(x, head.x, head.next.x, head.y, head.next.y);
     }
 
     @Override
     protected double extrapolateRight(double x) {
-        if (count == 1) {
-            return head.y;
-        }
         Node last = head.prev;
         return interpolate(x, last.prev.x, last.x, last.prev.y, last.y);
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
+        if (floorIndex < 0 || floorIndex >= count) {
+            throw new IllegalArgumentException("Некорректный floorIndex: " + floorIndex);
+        }
+
         if (floorIndex == count) {
             return extrapolateRight(x);
         }
@@ -307,7 +305,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     public void remove(int index) {
         if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("Индекс вне диапазона");
+            throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
         if (count <= 2) {
             throw new IllegalStateException("Нельзя удалить элемент из функции с менее чем 2 точками");
