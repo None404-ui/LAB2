@@ -83,5 +83,17 @@ public final class FunctionsIO {
         objectOutputStream.writeObject(function);
         objectOutputStream.flush();
     }
+
+    /**
+     * Десериализует табулированную функцию из буферизованного байтового потока
+     * @param stream буферизованный поток чтения
+     * @return табулированная функция
+     * @throws IOException если произошла ошибка ввода-вывода
+     * @throws ClassNotFoundException если класс не найден
+     */
+    public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
+        ObjectInputStream objectInputStream = new ObjectInputStream(stream);
+        return (TabulatedFunction) objectInputStream.readObject();
+    }
 }
 

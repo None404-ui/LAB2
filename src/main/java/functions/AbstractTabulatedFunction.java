@@ -4,12 +4,15 @@ import exceptions.ArrayIsNotSortedException;
 import exceptions.DifferentLengthOfArraysException;
 import exceptions.InterpolationException;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Абстрактный класс для табулированных функций
  */
-public abstract class AbstractTabulatedFunction implements TabulatedFunction {
+public abstract class AbstractTabulatedFunction implements TabulatedFunction, Serializable {
+    private static final long serialVersionUID = 1L;
+    
     protected int count;
 
     /**
