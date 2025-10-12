@@ -1,5 +1,6 @@
 package functions;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -7,7 +8,9 @@ import java.util.NoSuchElementException;
 /**
  * Табулированная функция на основе массивов.
  */
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable {
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable, Serializable {
+    private static final long serialVersionUID = -1646585929270415559L;
+    
     private double[] xValues;
     private double[] yValues;
 
