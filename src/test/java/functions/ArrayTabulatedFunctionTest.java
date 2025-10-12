@@ -360,3 +360,6 @@ class ArrayTabulatedFunctionTest {
         assertEquals(3.0, function.getX(2), 0.001);
     }
 }
+
+
+

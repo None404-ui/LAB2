@@ -77,3 +77,6 @@ class TabulatedFunctionCombinationsTest {
         assertEquals(16.0, composite.apply(4.0), 0.001);
     }
 }
+
+
+

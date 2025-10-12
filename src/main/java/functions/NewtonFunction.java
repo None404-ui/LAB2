@@ -90,3 +90,7 @@ public class NewtonFunction implements MathFunction {
         return derivative;
     }
 }
+
+
+
+

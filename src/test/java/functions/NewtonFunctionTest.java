@@ -182,3 +182,6 @@ class NewtonFunctionTest {
         assertEquals(16.0, quadratic.apply(root), 0.01);
     }
 }
+
+
+
