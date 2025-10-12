@@ -13,9 +13,9 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
      * Конструктор с массивами x и y
      */
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
-        if (xValues.length != yValues.length) {
-            throw new IllegalArgumentException("Массивы xValues и yValues должны иметь одинаковую длину");
-        }
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
+        
         if (xValues.length < 2) {
             throw new IllegalArgumentException("Должно быть как минимум 2 точки");
         }
@@ -23,13 +23,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         this.count = xValues.length;
         this.xValues = Arrays.copyOf(xValues, count);
         this.yValues = Arrays.copyOf(yValues, count);
-
-        // Проверяем, что xValues упорядочены
-        for (int i = 1; i < count; i++) {
-            if (xValues[i] <= xValues[i - 1]) {
-                throw new IllegalArgumentException("Значения x должны быть упорядочены по возрастанию");
-            }
-        }
     }
 
     /**
@@ -148,6 +141,11 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         int rightIndex = floorIndex + 1;
         if (rightIndex >= count) {
             return extrapolateRight(x);
+        }
+
+        // Проверяем, что x находится в интервале интерполирования
+        if (x < xValues[floorIndex] || x > xValues[rightIndex]) {
+            throw new exceptions.InterpolationException("x is outside the interpolation interval");
         }
 
         return interpolate(x, xValues[floorIndex], xValues[rightIndex],

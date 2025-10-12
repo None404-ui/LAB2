@@ -1,5 +1,9 @@
 package functions;
 
+import exceptions.ArrayIsNotSortedException;
+import exceptions.DifferentLengthOfArraysException;
+import exceptions.InterpolationException;
+
 import java.util.Arrays;
 
 /**
@@ -78,9 +82,30 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         int floorIndex = floorIndexOfX(x);
         return interpolate(x, floorIndex);
     }
+
+    /**
+     * Проверяет, что длины массивов одинаковые
+     * @param xValues массив значений x
+     * @param yValues массив значений y
+     * @throws DifferentLengthOfArraysException если длины массивов различаются
+     */
+    protected static void checkLengthIsTheSame(double[] xValues, double[] yValues) {
+        if (xValues.length != yValues.length) {
+            throw new DifferentLengthOfArraysException("Lengths of arrays are different");
+        }
+    }
+
+    /**
+     * Проверяет, что массив отсортирован по возрастанию
+     * @param xValues массив значений x
+     * @throws ArrayIsNotSortedException если массив не отсортирован
+     */
+    protected static void checkSorted(double[] xValues) {
+        for (int i = 1; i < xValues.length; i++) {
+            if (xValues[i] <= xValues[i - 1]) {
+                throw new ArrayIsNotSortedException("Array is not sorted");
+            }
+        }
+    }
 }
-
-
-
-
 

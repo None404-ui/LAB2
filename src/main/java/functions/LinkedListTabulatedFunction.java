@@ -27,21 +27,14 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
      * Конструктор из массивов
      */
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
-        if (xValues.length != yValues.length) {
-            throw new IllegalArgumentException("Массивы xValues и yValues должны иметь одинаковую длину");
-        }
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
+        
         if (xValues.length < 2) {
             throw new IllegalArgumentException("Должно быть как минимум 2 точки");
         }
 
         count = xValues.length;
-
-        // Проверяем, что xValues упорядочены
-        for (int i = 1; i < count; i++) {
-            if (xValues[i] <= xValues[i - 1]) {
-                throw new IllegalArgumentException("Значения x должны быть упорядочены по возрастанию");
-            }
-        }
 
         // Создаем циклический двусвязный список
         head = new Node(xValues[0], yValues[0]);
@@ -231,6 +224,11 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         Node rightNode = leftNode.next;
         if (rightNode == null) {
             return extrapolateRight(x);
+        }
+
+        // Проверяем, что x находится в интервале интерполирования
+        if (x < leftNode.x || x > rightNode.x) {
+            throw new exceptions.InterpolationException("x is outside the interpolation interval");
         }
 
         return interpolate(x, leftNode.x, rightNode.x, leftNode.y, rightNode.y);
