@@ -1,7 +1,9 @@
 package functions;
 
+import java.util.Iterator;
+
 //Интерфейс,расширяющий MathFunction
-public interface TabulatedFunction extends MathFunction {
+public interface TabulatedFunction extends MathFunction, Iterable<Point> {
 
     int getCount();
 
@@ -18,4 +20,6 @@ public interface TabulatedFunction extends MathFunction {
     double leftBound();
 
     double rightBound();
+
+    Iterator<Point> iterator();
 }

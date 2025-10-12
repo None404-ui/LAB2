@@ -1,6 +1,7 @@
 package functions;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * Табулированная функция на основе массивов.
@@ -220,5 +221,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         count++;
     }
 
-
+    @Override
+    public Iterator<Point> iterator() {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -1,5 +1,7 @@
 package functions;
 
+import java.util.Iterator;
+
 /**
  * Табулированная функция на основе связного списка
  */
@@ -295,6 +297,11 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         current.next.prev = newNode;
         current.next = newNode;
         count++;
+    }
+
+    @Override
+    public Iterator<Point> iterator() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
