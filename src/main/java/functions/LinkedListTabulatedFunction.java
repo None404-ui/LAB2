@@ -2,19 +2,25 @@ package functions;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.io.Serializable;
 
 /**
  * Табулированная функция на основе связного списка
  */
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable {
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
+
+    private static final long serialVersionUID = -6840012326514459866L;
+
 
     private Node head;
-    // count наследуется от AbstractTabulatedFunction
 
     /**
      * Узел связного списка
      */
-    private static class Node {
+
+    private static class Node implements Serializable {
+        private static final long serialVersionUID = -7921302996832001741L;
+
         double x;
         double y;
         Node next;
@@ -25,6 +31,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             this.y = y;
         }
     }
+
+
 
     /**
      * Конструктор из массивов
