@@ -3,11 +3,14 @@ package io;
 import functions.Point;
 import functions.TabulatedFunction;
 import functions.factory.TabulatedFunctionFactory;
-
 import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 
 /**
  * Класс для ввода/вывода табулированных функций
@@ -97,15 +100,10 @@ public final class FunctionsIO {
 
     /**
      * Десериализует табулированную функцию из буферизованного байтового потока
-     * @param stream буферизованный поток чтения
      * @return табулированная функция
      * @throws IOException если произошла ошибка ввода-вывода
      * @throws ClassNotFoundException если класс не найден
      */
-    public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
-        ObjectInputStream objectInputStream = new ObjectInputStream(stream);
-        return (TabulatedFunction) objectInputStream.readObject();
-    }
 
     public static TabulatedFunction readTabulatedFunction(BufferedInputStream inputStream,
                                                           TabulatedFunctionFactory factory) throws IOException {
@@ -126,6 +124,20 @@ public final class FunctionsIO {
         return factory.create(xValues, yValues);
     }
 
+    public static TabulatedFunction deserialize(BufferedInputStream stream)
+            throws IOException, ClassNotFoundException {
+
+        // Создаем ObjectInputStream из BufferedInputStream
+        ObjectInputStream objectInputStream = new ObjectInputStream(stream);
+
+        // Читаем объект из потока
+        Object obj = objectInputStream.readObject();
+
+        //  Приводим тип к TabulatedFunction
+        TabulatedFunction function = (TabulatedFunction) obj;
+        //  Возвращаем десериализованную функцию
+        return function;
+    }
 
 }
 
