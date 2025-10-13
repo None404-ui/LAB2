@@ -140,7 +140,12 @@ public class TabulatedFunctionOperationService {
      * @return результат деления
      */
     public TabulatedFunction divide(TabulatedFunction a, TabulatedFunction b) {
-        return doOperation(a, b, (u, v) -> u / v);
+        return doOperation(a, b, (u, v) -> {
+            if (v == 0) {
+                throw new ArithmeticException("Division by zero");
+            }
+            return u / v;
+        });
     }
 }
 
