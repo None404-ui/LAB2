@@ -122,5 +122,25 @@ public class TabulatedFunctionOperationService {
     public TabulatedFunction subtract(TabulatedFunction a, TabulatedFunction b) {
         return doOperation(a, b, (u, v) -> u - v);
     }
+
+    /**
+     * Умножение двух табулированных функций
+     * @param a первая функция
+     * @param b вторая функция
+     * @return результат умножения
+     */
+    public TabulatedFunction multiply(TabulatedFunction a, TabulatedFunction b) {
+        return doOperation(a, b, (u, v) -> u * v);
+    }
+
+    /**
+     * Деление двух табулированных функций
+     * @param a первая функция
+     * @param b вторая функция
+     * @return результат деления
+     */
+    public TabulatedFunction divide(TabulatedFunction a, TabulatedFunction b) {
+        return doOperation(a, b, (u, v) -> u / v);
+    }
 }
 

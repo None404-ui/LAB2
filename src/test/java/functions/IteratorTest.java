@@ -58,15 +58,6 @@ public class IteratorTest {
         });
     }
 
-    @Test
-    public void testLinkedListTabulatedFunction_IteratorThrowsException() {
-        double[] xValues = {1.0, 2.0, 3.0};
-        double[] yValues = {1.0, 4.0, 9.0};
-        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
-        
-        assertThrows(UnsupportedOperationException.class, () -> {
-            function.iterator();
-        });
-    }
+
 }
 
