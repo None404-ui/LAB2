@@ -106,5 +106,26 @@ public final class FunctionsIO {
         ObjectInputStream objectInputStream = new ObjectInputStream(stream);
         return (TabulatedFunction) objectInputStream.readObject();
     }
+
+    public static TabulatedFunction readTabulatedFunction(BufferedInputStream inputStream,
+                                                          TabulatedFunctionFactory factory) throws IOException {
+        DataInputStream dataInputStream = new DataInputStream(inputStream);
+
+        // Читаем количество точек
+        int count = dataInputStream.readInt();  // читаем int из потока
+
+        double[] xValues = new double[count];
+        double[] yValues = new double[count];
+
+        // читаем double из потока
+        for (int i = 0; i < count; i++) {
+            xValues[i] = dataInputStream.readDouble();  // читаем x
+            yValues[i] = dataInputStream.readDouble();  // читаем y
+        }
+
+        return factory.create(xValues, yValues);
+    }
+
+
 }
 
