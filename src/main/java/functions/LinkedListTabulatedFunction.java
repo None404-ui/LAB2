@@ -1,6 +1,7 @@
 package functions;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Табулированная функция на основе связного списка
@@ -299,7 +300,32 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public Iterator<Point> iterator() {
-        throw new UnsupportedOperationException();
+        return new Iterator<Point>() {
+            private Node currentNode = head;  // начинаем с головы списка
+            private int returnedCount = 0;    // счетчик возвращенных элементов
+
+            @Override
+            public boolean hasNext() {
+                // Есть следующий элемент, если мы еще не вернули все элементы
+                return returnedCount < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException("Нет больше элементов в итераторе");
+                }
+
+                // Создаем точку из текущего узла
+                Point point = new Point(currentNode.x, currentNode.y);
+
+                // Переходим к следующему узлу
+                currentNode = currentNode.next;
+                returnedCount++;
+
+                return point;
+            }
+        };
     }
 
     @Override

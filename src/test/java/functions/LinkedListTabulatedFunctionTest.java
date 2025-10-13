@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import exceptions.DifferentLengthOfArraysException;
 import exceptions.ArrayIsNotSortedException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Тесты для LinkedListTabulatedFunction
@@ -211,6 +213,72 @@ class LinkedListTabulatedFunctionTest {
                 new double[]{1.0, 2.0}, new double[]{1.0, 4.0});
 
         assertThrows(IllegalArgumentException.class, () -> function.floorIndexOfX(0.5));
+    }
+
+    @Test
+    void testIteratorWithWhileLoop() {
+        double[] xValues = {1.0, 2.0, 3.0, 4.0};
+        double[] yValues = {1.0, 4.0, 9.0, 16.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        Iterator<Point> iterator = function.iterator();
+        int pointCount = 0;
+
+        // Тестируем цикл while
+        while (iterator.hasNext()) {
+            Point point = iterator.next();
+            assertEquals(xValues[pointCount], point.x, 0.001);
+            assertEquals(yValues[pointCount], point.y, 0.001);
+            pointCount++;
+        }
+
+        assertEquals(4, pointCount); // Проверяем, что прошли все точки
+
+        // Проверяем, что после окончания бросается исключение
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
+    }
+
+    @Test
+    void testIteratorWithForEachLoop() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        int pointCount = 0;
+
+        // Тестируем цикл for-each
+        for (Point point : function) {
+            assertEquals(xValues[pointCount], point.x, 0.001);
+            assertEquals(yValues[pointCount], point.y, 0.001);
+            pointCount++;
+        }
+
+        assertEquals(3, pointCount); // Проверяем, что прошли все точки
+    }
+
+    @Test
+    void testIteratorEdgeCases() {
+        // Тест с минимальным количеством точек
+        double[] xValues = {1.0, 2.0};
+        double[] yValues = {1.0, 4.0};
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        Iterator<Point> iterator = function.iterator();
+
+        // Первый вызов next()
+        Point point1 = iterator.next();
+        assertEquals(1.0, point1.x, 0.001);
+        assertEquals(1.0, point1.y, 0.001);
+        assertTrue(iterator.hasNext());
+
+        // Второй вызов next()
+        Point point2 = iterator.next();
+        assertEquals(2.0, point2.x, 0.001);
+        assertEquals(4.0, point2.y, 0.001);
+        assertFalse(iterator.hasNext()); // Больше нет элементов
+
+        // Проверяем исключение
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
     }
 
 }
