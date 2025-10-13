@@ -114,14 +114,25 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction, Se
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName()).append(" size = ").append(count).append("\n");
-        for (int i = 0; i < count; i++) {
-            sb.append("[").append(getX(i)).append("; ").append(getY(i)).append("]");
-            if (i < count - 1) {
-                sb.append("\n");
-            }
+
+        // Первая строка: название класса и размер
+        sb.append(getClass().getSimpleName())
+                .append(" size = ")
+                .append(count)
+                .append("\n");
+
+        // Добавляем все точки через цикл for-each
+        for (Point point : this) {
+            sb.append("[")
+                    .append(point.x)
+                    .append("; ")
+                    .append(point.y)
+                    .append("]\n");
         }
+
         return sb.toString();
     }
+
+
 }
 

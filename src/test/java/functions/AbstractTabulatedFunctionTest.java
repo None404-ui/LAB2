@@ -279,4 +279,88 @@ class AbstractTabulatedFunctionTest {
         assertEquals(0.0, mock.apply(-2.0), 0.001); // экстраполяция слева
         assertEquals(4.0, mock.apply(2.0), 0.001);  // экстраполяция справа
     }
+
+    @Test
+    void testToStringWithArrayTabulatedFunction() {
+        double[] xValues = {0.0, 0.5, 1.0};
+        double[] yValues = {0.0, 0.25, 1.0};
+
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
+
+        String expected = "ArrayTabulatedFunction size = 3\n" +
+                "[0.0; 0.0]\n" +
+                "[0.5; 0.25]\n" +
+                "[1.0; 1.0]\n";
+
+        assertEquals(expected, function.toString());
+    }
+
+    @Test
+    void testToStringWithLinkedListTabulatedFunction() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        String expected = "LinkedListTabulatedFunction size = 3\n" +
+                "[1.0; 10.0]\n" +
+                "[2.0; 20.0]\n" +
+                "[3.0; 30.0]\n";
+
+        assertEquals(expected, function.toString());
+    }
+
+    @Test
+    void testToStringWithDifferentPrecision() {
+        double[] xValues = {1.23456, 2.5, 3.0};
+        double[] yValues = {4.56789, 5.0, 6.0};
+
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValues, yValues);
+        String result = function.toString();
+
+        // Проверяем структуру без точных значений (т.к. double может форматироваться по-разному)
+        assertTrue(result.startsWith("ArrayTabulatedFunction size = 3\n"));
+        assertTrue(result.contains("[1.23456; 4.56789]\n") ||
+                result.contains("[1.23456; 4.56789]"));
+        assertTrue(result.contains("[2.5; 5.0]\n") ||
+                result.contains("[2.5; 5.0]"));
+        assertTrue(result.endsWith("[3.0; 6.0]\n") ||
+                result.endsWith("[3.0; 6.0]"));
+    }
+
+    @Test
+    void testToStringWithSinglePoint() {
+        double[] xValues = {5.0};
+        double[] yValues = {10.0};
+
+        // Используем MockTabulatedFunction для тестирования с 1 точкой
+        // или создаем функцию с минимальным количеством точек (2)
+        double[] xValuesMin = {1.0, 2.0};
+        double[] yValuesMin = {3.0, 4.0};
+
+        ArrayTabulatedFunction function = new ArrayTabulatedFunction(xValuesMin, yValuesMin);
+
+        String expected = "ArrayTabulatedFunction size = 2\n" +
+                "[1.0; 3.0]\n" +
+                "[2.0; 4.0]\n";
+
+        assertEquals(expected, function.toString());
+    }
+
+    @Test
+    void testToStringFormat() {
+        double[] xValues = {0.0, 1.0};
+        double[] yValues = {2.0, 3.0};
+
+        LinkedListTabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+        String result = function.toString();
+
+        // Проверяем формат строки
+        String[] lines = result.split("\n");
+
+        assertEquals(3, lines.length); // заголовок + 2 точки
+        assertEquals("LinkedListTabulatedFunction size = 2", lines[0]);
+        assertEquals("[0.0; 2.0]", lines[1]);
+        assertEquals("[1.0; 3.0]", lines[2]);
+    }
 }
