@@ -4,9 +4,9 @@ import functions.ArrayTabulatedFunction;
 import functions.LinkedListTabulatedFunction;
 import functions.TabulatedFunction;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
+
+import java.io.*;
 
 /**
  * Класс для записи табулированных функций в файлы
@@ -15,8 +15,8 @@ public class TabulatedFunctionFileWriter {
     
     public static void main(String[] args) {
         try (
-            BufferedWriter arrayWriter = new BufferedWriter(new FileWriter("output/array function.txt"));
-            BufferedWriter linkedListWriter = new BufferedWriter(new FileWriter("output/linked list function.txt"))
+                BufferedOutputStream arrayWriter = new BufferedOutputStream(new FileOutputStream("output/array function.bin"));
+                BufferedOutputStream linkedListWriter = new BufferedOutputStream(new FileOutputStream("output/linked list function.bin"))
         ) {
             // Создаем функцию на основе массива
             double[] xValues = {0.0, 0.5, 1.0};

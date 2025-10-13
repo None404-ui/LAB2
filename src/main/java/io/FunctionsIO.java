@@ -29,16 +29,27 @@ public final class FunctionsIO {
      * @param function табулированная функция
      * @throws IOException если произошла ошибка ввода-вывода
      */
-    public static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction function) throws IOException {
-        PrintWriter printWriter = new PrintWriter(writer);
-        
-        printWriter.println(function.getCount());
-        
+    /**
+     * Записывает табулированную функцию в байтовый поток
+     * @param outputStream буферизованный байтовый поток
+     * @param function табулированная функция
+     * @throws IOException если произошла ошибка ввода-вывода
+     */
+    public static void writeTabulatedFunction(BufferedOutputStream outputStream,
+                                              TabulatedFunction function) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+
+        // Записываем количество точек
+        dataOutputStream.writeInt(function.getCount());
+
+        // Записываем все точки (x, y)
         for (Point point : function) {
-            printWriter.printf("%f %f\n", point.x, point.y);
+            dataOutputStream.writeDouble(point.x);
+            dataOutputStream.writeDouble(point.y);
         }
-        
-        printWriter.flush();
+
+        // Сбрасываем буфер, но не закрываем поток
+        dataOutputStream.flush();
     }
 
     /**
