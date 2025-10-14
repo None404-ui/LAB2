@@ -4,8 +4,6 @@ import functions.ArrayTabulatedFunction;
 import functions.LinkedListTabulatedFunction;
 import functions.TabulatedFunction;
 
-import java.io.IOException;
-
 import java.io.*;
 
 /**
@@ -15,8 +13,8 @@ public class TabulatedFunctionFileWriter {
     
     public static void main(String[] args) {
         try (
-                BufferedOutputStream arrayWriter = new BufferedOutputStream(new FileOutputStream("output/array function.bin"));
-                BufferedOutputStream linkedListWriter = new BufferedOutputStream(new FileOutputStream("output/linked list function.bin"))
+                BufferedWriter arrayWriter = new BufferedWriter(new FileWriter("output/array function.txt"));
+                BufferedWriter linkedListWriter = new BufferedWriter(new FileWriter("output/linked list function.txt"))
         ) {
             // Создаем функцию на основе массива
             double[] xValues = {0.0, 0.5, 1.0};
