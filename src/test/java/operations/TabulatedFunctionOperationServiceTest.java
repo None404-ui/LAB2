@@ -36,11 +36,14 @@ public class TabulatedFunctionOperationServiceTest {
         double[] xValues = {0.0, 1.0, 2.0};
         double[] yValues = {0.0, 1.0, 8.0};
         TabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
-        
-        // LinkedListTabulatedFunction пока выбрасывает UnsupportedOperationException
-        assertThrows(UnsupportedOperationException.class, () -> {
-            TabulatedFunctionOperationService.asPoints(function);
-        });
+
+        Point[] points = TabulatedFunctionOperationService.asPoints(function);
+
+        assertEquals(3, points.length);
+        for (int i = 0; i < points.length; i++) {
+            assertEquals(xValues[i], points[i].x, 0.001);
+            assertEquals(yValues[i], points[i].y, 0.001);
+        }
     }
 
     @Test
