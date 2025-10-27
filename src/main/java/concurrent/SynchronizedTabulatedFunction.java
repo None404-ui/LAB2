@@ -2,6 +2,7 @@ package concurrent;
 
 import functions.Point;
 import functions.TabulatedFunction;
+import operations.TabulatedFunctionOperationService;
 import java.util.Iterator;
 
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
@@ -60,10 +61,10 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
 
     @Override
     public synchronized Iterator<Point> iterator() {
-        Point[] points = new Point[function.getCount()];
-        for (int i = 0; i < function.getCount(); i++) {
-            points[i] = new Point(function.getX(i), function.getY(i));
-        }
-        return java.util.Arrays.asList(points).iterator();
+        // создаем копию точек с помощью TabulatedFunctionOperationService.asPoints()
+        Point[] pointsCopy = TabulatedFunctionOperationService.asPoints(function);
+
+        // возвращаем итератор по неизменяемой копии данных
+        return java.util.Arrays.asList(pointsCopy).iterator();
     }
 }
