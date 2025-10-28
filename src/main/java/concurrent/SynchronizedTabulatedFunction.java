@@ -9,9 +9,19 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     private final TabulatedFunction function;
     private final Object lock;
 
+    public interface Operation<T> {
+        T apply(SynchronizedTabulatedFunction function);
+    }
+
     public SynchronizedTabulatedFunction(TabulatedFunction function) {
         this.function = function;
         this.lock = this;
+    }
+
+    public <T> T doSynchronously(Operation<T> operation) {
+        synchronized (lock) {
+            return operation.apply(this);
+        }
     }
 
     @Override

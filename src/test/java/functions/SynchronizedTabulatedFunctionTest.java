@@ -3,6 +3,9 @@ package functions;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import concurrent.SynchronizedTabulatedFunction;
+import functions.ArrayTabulatedFunction;
+import functions.TabulatedFunction;
+import functions.Point;
 import java.util.Iterator;
 
 
@@ -112,5 +115,101 @@ class SynchronizedTabulatedFunctionTest {
             count++;
         }
         assertEquals(3, count);
+    }
+
+    @Test
+    void testDoSynchronouslyWithIntegerResult() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        TabulatedFunction original = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunc = new SynchronizedTabulatedFunction(original);
+
+        Integer result = syncFunc.doSynchronously(new SynchronizedTabulatedFunction.Operation<Integer>() {
+            @Override
+            public Integer apply(SynchronizedTabulatedFunction function) {
+                return function.getCount();
+            }
+        });
+
+        assertEquals(3, result);
+    }
+
+    @Test
+    void testDoSynchronouslyWithDoubleResult() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        TabulatedFunction original = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunc = new SynchronizedTabulatedFunction(original);
+
+        Double result = syncFunc.doSynchronously(function -> {
+            function.setY(0, 15.0);
+            return function.getY(0);
+        });
+
+        assertEquals(15.0, result);
+    }
+
+    @Test
+    void testDoSynchronouslyWithVoidResult() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        TabulatedFunction original = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunc = new SynchronizedTabulatedFunction(original);
+
+        Void result = syncFunc.doSynchronously(function -> {
+            function.setY(1, 25.0);
+            function.setY(2, 35.0);
+            return null;
+        });
+
+        assertNull(result);
+        assertEquals(25.0, syncFunc.getY(1));
+        assertEquals(35.0, syncFunc.getY(2));
+    }
+
+    @Test
+    void testDoSynchronouslyWithStringResult() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        TabulatedFunction original = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunc = new SynchronizedTabulatedFunction(original);
+
+        String result = syncFunc.doSynchronously(function -> {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < function.getCount(); i++) {
+                sb.append("(").append(function.getX(i)).append(",").append(function.getY(i)).append(") ");
+            }
+            return sb.toString().trim();
+        });
+
+        assertEquals("(1.0,10.0) (2.0,20.0) (3.0,30.0)", result);
+    }
+
+    @Test
+    void testDoSynchronouslyMultipleOperations() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        TabulatedFunction original = new ArrayTabulatedFunction(xValues, yValues);
+        SynchronizedTabulatedFunction syncFunc = new SynchronizedTabulatedFunction(original);
+
+        // Выполняем несколько операций атомарно
+        Double sum = syncFunc.doSynchronously(function -> {
+            double total = 0.0;
+            for (int i = 0; i < function.getCount(); i++) {
+                total += function.getY(i);
+                function.setY(i, function.getY(i) * 2); // удваиваем каждое значение
+            }
+            return total;
+        });
+
+        assertEquals(60.0, sum); // 10 + 20 + 30
+        assertEquals(20.0, syncFunc.getY(0)); // 10 * 2
+        assertEquals(40.0, syncFunc.getY(1)); // 20 * 2
+        assertEquals(60.0, syncFunc.getY(2)); // 30 * 2
     }
 }
