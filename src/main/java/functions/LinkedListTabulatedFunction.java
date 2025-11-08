@@ -1,5 +1,7 @@
 package functions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.io.Serializable;
@@ -8,6 +10,7 @@ import java.io.Serializable;
  * Табулированная функция на основе связного списка
  */
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(LinkedListTabulatedFunction.class);
 
     private static final long serialVersionUID = -6840012326514459866L;
 
@@ -38,6 +41,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
      * Конструктор из массивов
      */
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
+        logger.info("Creating LinkedListTabulatedFunction with {} points", xValues.length);
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);
         
@@ -264,6 +268,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void insert(double x, double y) {
+        logger.info("Inserting point in linked list: x={}, y={}", x, y);
         // Если список пустой, просто добавляем узел
         if (count == 0) {
             addNode(x, y);
@@ -338,6 +343,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public void remove(int index) {
+        logger.info("Removing point from linked list at index {}", index);
         if (index < 0 || index >= count) {
             throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }

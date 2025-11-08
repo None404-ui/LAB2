@@ -1,5 +1,7 @@
 package io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import functions.Point;
 import functions.TabulatedFunction;
 import functions.factory.TabulatedFunctionFactory;
@@ -17,6 +19,7 @@ import java.io.ObjectInputStream;
  * Не может иметь наследников и экземпляров
  */
 public final class FunctionsIO {
+    private static final Logger logger = LoggerFactory.getLogger(FunctionsIO.class);
     
     /**
      * Приватный конструктор, запрещающий создание экземпляров
@@ -33,6 +36,7 @@ public final class FunctionsIO {
      * @throws IOException если произошла ошибка ввода-вывода
      */
     public static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction function) throws IOException {
+        logger.info("Writing function to text stream: {} points", function.getCount());
         PrintWriter printWriter = new PrintWriter(writer);
         
         // Записываем количество точек
@@ -41,10 +45,12 @@ public final class FunctionsIO {
         // Записываем все точки (x y)
         for (Point point : function) {
             printWriter.printf("%f %f\n", point.x, point.y);
+            logger.trace("Written point: x={}, y={}", point.x, point.y);
         }
         
         // Сбрасываем буфер, но не закрываем поток
         printWriter.flush();
+        logger.debug("Function written to text stream successfully");
     }
 
     /**
@@ -78,8 +84,11 @@ public final class FunctionsIO {
      * @throws IOException если произошла ошибка ввода-вывода
      */
     public static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory) throws IOException {
+
+        logger.info("Reading function from text stream");
         String line = reader.readLine();
         int count = Integer.parseInt(line);
+        logger.debug("Reading function with {} points", count);
         
         double[] xValues = new double[count];
         double[] yValues = new double[count];
@@ -94,10 +103,12 @@ public final class FunctionsIO {
                 xValues[i] = numberFormat.parse(values[0]).doubleValue();
                 yValues[i] = numberFormat.parse(values[1]).doubleValue();
             } catch (ParseException e) {
+                logger.error("Parse error for line: {}", line, e);
                 throw new IOException(e);
             }
         }
-        
+
+        logger.debug("Function read from text stream successfully");
         return factory.create(xValues, yValues);
     }
 
@@ -108,9 +119,16 @@ public final class FunctionsIO {
      * @throws IOException если произошла ошибка ввода-вывода
      */
     public static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(stream);
-        objectOutputStream.writeObject(function);
-        objectOutputStream.flush();
+        logger.info("Serializing {} to stream", function.getClass().getSimpleName());
+
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(stream)) {
+            objectOutputStream.writeObject(function);
+            objectOutputStream.flush();
+            logger.debug("Serialization completed");
+        } catch (IOException e) {
+            logger.error("Serialization failed", e);
+            throw e;
+        }
     }
 
     /**
@@ -141,6 +159,7 @@ public final class FunctionsIO {
 
     public static TabulatedFunction deserialize(BufferedInputStream stream)
             throws IOException, ClassNotFoundException {
+        logger.info("Deserializing function from stream");
 
         // Создаем ObjectInputStream из BufferedInputStream
         ObjectInputStream objectInputStream = new ObjectInputStream(stream);
@@ -151,6 +170,8 @@ public final class FunctionsIO {
         //  Приводим тип к TabulatedFunction
         TabulatedFunction function = (TabulatedFunction) obj;
         //  Возвращаем десериализованную функцию
+        logger.debug("Deserialized {} with {} points",
+                function.getClass().getSimpleName(), function.getCount());
         return function;
     }
 
