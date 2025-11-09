@@ -71,12 +71,17 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
      * Конструктор для табулирования функции на интервале
      */
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
+        logger.info("Creating LinkedListTabulatedFunction from {} in range [{}, {}] with {} points",
+                source.getClass().getSimpleName(), xFrom, xTo, count);
+
         if (count < 2) {
+            logger.error("Count must be at least 2, but was {}", count);
             throw new IllegalArgumentException("Количество точек должно быть как минимум 2");
         }
 
         // Меняем местами если xFrom > xTo
         if (xFrom > xTo) {
+            logger.debug("Swapping xFrom and xTo: {} -> {}", xFrom, xTo);
             double temp = xFrom;
             xFrom = xTo;
             xTo = temp;
@@ -97,17 +102,20 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             double y = source.apply(x);
             Node newNode = new Node(x, y);
             Node last = head.prev;
-            
+
             last.next = newNode;
             newNode.prev = last;
             newNode.next = head;
             head.prev = newNode;
         }
+
+        logger.debug("LinkedListTabulatedFunction created successfully from function");
     }
 
     @Override
     public double getX(int index) {
         if (index < 0 || index >= count) {
+            logger.error("Index out of bounds: {} (count: {})", index, count);
             throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
 
@@ -115,12 +123,14 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         for (int i = 0; i < index; i++) {
             current = current.next;
         }
+        logger.trace("Getting X at index {}: {}", index, current.x);
         return current.x;
     }
 
     @Override
     public double getY(int index) {
         if (index < 0 || index >= count) {
+            logger.error("Index out of bounds: {} (count: {})", index, count);
             throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
 
@@ -128,12 +138,15 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         for (int i = 0; i < index; i++) {
             current = current.next;
         }
+        logger.trace("Getting Y at index {}: {}", index, current.y);
         return current.y;
     }
 
     @Override
     public void setY(int index, double value) {
+        logger.debug("Setting Y at index {} to {}", index, value);
         if (index < 0 || index >= count) {
+            logger.error("Index out of bounds: {} (count: {})", index, count);
             throw new IllegalArgumentException("индекс " + index + " вне допустимого диапазона [0, " + (count-1) + "]");
         }
 
@@ -147,6 +160,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     @Override
     public int indexOfX(double x) {
         if (head == null) {
+            logger.trace("List is empty, returning -1 for x = {}", x);
             return -1;
         }
 
@@ -155,18 +169,21 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         do {
             if (current.x == x) {
+                logger.trace("Found x = {} at index {}", x, index);
                 return index;
             }
             current = current.next;
             index++;
         } while (current != head);
 
+        logger.trace("x = {} not found in list", x);
         return -1;
     }
 
     @Override
     public int indexOfY(double y) {
         if (head == null) {
+            logger.trace("List is empty, returning -1 for y = {}", y);
             return -1;
         }
 
@@ -175,22 +192,26 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         do {
             if (current.y == y) {
+                logger.trace("Found y = {} at index {}", y, index);
                 return index;
             }
             current = current.next;
             index++;
         } while (current != head);
 
+        logger.trace("y = {} not found in list", y);
         return -1;
     }
 
     @Override
     protected int floorIndexOfX(double x) {
+        logger.trace("Finding floor index for x = {}", x);
         if (head == null) {
             return 0;
         }
 
         if (x < head.x) {
+            logger.error("x = {} is less than left boundary {}", x, head.x);
             throw new IllegalArgumentException("x = " + x + " меньше левой границы " + head.x);
         }
 
@@ -202,16 +223,19 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             index++;
         }
 
+        logger.trace("Floor index for x = {} is {}", x, index);
         return index;
     }
 
     @Override
     protected double extrapolateLeft(double x) {
+        logger.debug("Extrapolating left at x = {}", x);
         return interpolate(x, head.x, head.next.x, head.y, head.next.y);
     }
 
     @Override
     protected double extrapolateRight(double x) {
+        logger.debug("Extrapolating right at x = {}", x);
         Node last = head.prev;
         return interpolate(x, last.prev.x, last.x, last.prev.y, last.y);
     }
