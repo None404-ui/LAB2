@@ -1,4 +1,3 @@
-// transformer/DtoTransformer.java
 package transformer;
 
 import dto.*;
@@ -27,14 +26,20 @@ public class DtoTransformer {
             user.setEmail(rs.getString("email"));
             user.setPasswordHash(rs.getString("password_hash"));
 
-            Timestamp createdAt = rs.getTimestamp("created_at");
-            if (createdAt != null) {
-                user.setCreatedAt(createdAt.toLocalDateTime());
+            // Проверяем наличие поля created_at в ResultSet
+            if (hasColumn(rs, "created_at")) {
+                Timestamp createdAt = rs.getTimestamp("created_at");
+                if (createdAt != null) {
+                    user.setCreatedAt(createdAt.toLocalDateTime());
+                }
             }
 
-            Timestamp updatedAt = rs.getTimestamp("updated_at");
-            if (updatedAt != null) {
-                user.setUpdatedAt(updatedAt.toLocalDateTime());
+            // Проверяем наличие поля updated_at в ResultSet
+            if (hasColumn(rs, "updated_at")) {
+                Timestamp updatedAt = rs.getTimestamp("updated_at");
+                if (updatedAt != null) {
+                    user.setUpdatedAt(updatedAt.toLocalDateTime());
+                }
             }
 
             logger.debug("Successfully transformed UserDto: {}", user.getUsername());
@@ -46,7 +51,82 @@ public class DtoTransformer {
         }
     }
 
-    // Трансформация Map в UserDto (для веб-интерфейса)
+    // Трансформация ResultSet в FunctionDto
+    public static FunctionDto toFunctionDto(ResultSet rs) throws SQLException {
+        logger.debug("Transforming ResultSet to FunctionDto");
+
+        try {
+            FunctionDto function = new FunctionDto();
+            function.setFunctionId(rs.getInt("function_id"));
+            function.setName(rs.getString("name"));
+            function.setExpression(rs.getString("expression"));
+            function.setUserId(rs.getInt("user_id"));
+
+            // Проверяем наличие поля created_at в ResultSet
+            if (hasColumn(rs, "created_at")) {
+                Timestamp createdAt = rs.getTimestamp("created_at");
+                if (createdAt != null) {
+                    function.setCreatedAt(createdAt.toLocalDateTime());
+                }
+            }
+
+            // Проверяем наличие поля updated_at в ResultSet
+            if (hasColumn(rs, "updated_at")) {
+                Timestamp updatedAt = rs.getTimestamp("updated_at");
+                if (updatedAt != null) {
+                    function.setUpdatedAt(updatedAt.toLocalDateTime());
+                }
+            }
+
+            logger.debug("Successfully transformed FunctionDto: {}", function.getName());
+            return function;
+
+        } catch (SQLException e) {
+            logger.error("Error transforming ResultSet to FunctionDto: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    // Трансформация ResultSet в PointDto
+    public static PointDto toPointDto(ResultSet rs) throws SQLException {
+        logger.debug("Transforming ResultSet to PointDto");
+
+        try {
+            PointDto point = new PointDto();
+            point.setPointId(rs.getInt("point_id"));
+            point.setFunctionId(rs.getInt("function_id"));
+            point.setXValue(rs.getDouble("x_value"));
+            point.setYValue(rs.getDouble("y_value"));
+
+            // Проверяем наличие поля computed_at в ResultSet
+            if (hasColumn(rs, "computed_at")) {
+                Timestamp computedAt = rs.getTimestamp("computed_at");
+                if (computedAt != null) {
+                    point.setComputedAt(computedAt.toLocalDateTime());
+                }
+            }
+
+            logger.debug("Successfully transformed PointDto for function: {}", point.getFunctionId());
+            return point;
+
+        } catch (SQLException e) {
+            logger.error("Error transforming ResultSet to PointDto: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    // Вспомогательный метод для проверки наличия колонки в ResultSet
+    private static boolean hasColumn(ResultSet rs, String columnName) {
+        try {
+            rs.findColumn(columnName);
+            return true;
+        } catch (SQLException e) {
+            logger.debug("Column {} not found in ResultSet", columnName);
+            return false;
+        }
+    }
+
+    // Остальные методы остаются без изменений
     public static UserDto toUserDto(Map<String, String> params) {
         logger.debug("Transforming Map to UserDto with params: {}", params.keySet());
 
@@ -75,37 +155,6 @@ public class DtoTransformer {
         }
     }
 
-    // Трансформация ResultSet в FunctionDto
-    public static FunctionDto toFunctionDto(ResultSet rs) throws SQLException {
-        logger.debug("Transforming ResultSet to FunctionDto");
-
-        try {
-            FunctionDto function = new FunctionDto();
-            function.setFunctionId(rs.getInt("function_id"));
-            function.setName(rs.getString("name"));
-            function.setExpression(rs.getString("expression"));
-            function.setUserId(rs.getInt("user_id"));
-
-            Timestamp createdAt = rs.getTimestamp("created_at");
-            if (createdAt != null) {
-                function.setCreatedAt(createdAt.toLocalDateTime());
-            }
-
-            Timestamp updatedAt = rs.getTimestamp("updated_at");
-            if (updatedAt != null) {
-                function.setUpdatedAt(updatedAt.toLocalDateTime());
-            }
-
-            logger.debug("Successfully transformed FunctionDto: {}", function.getName());
-            return function;
-
-        } catch (SQLException e) {
-            logger.error("Error transforming ResultSet to FunctionDto: {}", e.getMessage());
-            throw e;
-        }
-    }
-
-    // Трансформация Map в FunctionDto
     public static FunctionDto toFunctionDto(Map<String, String> params) {
         logger.debug("Transforming Map to FunctionDto with params: {}", params.keySet());
 
@@ -134,32 +183,6 @@ public class DtoTransformer {
         }
     }
 
-    // Трансформация ResultSet в PointDto
-    public static PointDto toPointDto(ResultSet rs) throws SQLException {
-        logger.debug("Transforming ResultSet to PointDto");
-
-        try {
-            PointDto point = new PointDto();
-            point.setPointId(rs.getInt("point_id"));
-            point.setFunctionId(rs.getInt("function_id"));
-            point.setXValue(rs.getDouble("x_value"));
-            point.setYValue(rs.getDouble("y_value"));
-
-            Timestamp computedAt = rs.getTimestamp("computed_at");
-            if (computedAt != null) {
-                point.setComputedAt(computedAt.toLocalDateTime());
-            }
-
-            logger.debug("Successfully transformed PointDto for function: {}", point.getFunctionId());
-            return point;
-
-        } catch (SQLException e) {
-            logger.error("Error transforming ResultSet to PointDto: {}", e.getMessage());
-            throw e;
-        }
-    }
-
-    // Трансформация Map в PointDto
     public static PointDto toPointDto(Map<String, String> params) {
         logger.debug("Transforming Map to PointDto with params: {}", params.keySet());
 
@@ -188,7 +211,6 @@ public class DtoTransformer {
         }
     }
 
-    // Трансформация списка ResultSet в список DTO
     public static List<UserDto> toUserDtoList(ResultSet rs) throws SQLException {
         logger.debug("Transforming ResultSet to List<UserDto>");
         List<UserDto> users = new ArrayList<>();
@@ -243,7 +265,6 @@ public class DtoTransformer {
         }
     }
 
-    // Валидация DTO объектов
     public static boolean validateUserDto(UserDto user) {
         logger.debug("Validating UserDto: {}", user.getUsername());
 
