@@ -1,0 +1,14 @@
+Test Name,Entity Type,Sort Type,Record Count,Execution Time (ms),With Index,Notes
+Numeric Sort,points,x_value ASC,5,1074,true,Numeric field sorting
+String Sort,functions,name ASC,128,232,true,String field sorting
+No Pagination,users,username ASC,50608,2454,true,Full dataset sorting
+With Pagination,users,username ASC,10,182,true,Limited results with pagination
+Complex Multi-Criteria,functions,user_id ASC, name DESC,10,166,true,Multiple filters + multi-sort + pagination
+User Sorting,users,username ASC,50608,1547,true,User entity sorting
+Function Sorting,functions,name ASC,128,157,true,Function entity sorting
+Point Sorting,points,x_value ASC,5,180,true,Point entity sorting
+Single Field ASC,users,username ASC,50608,1569,true,Basic single field sorting
+Single Field DESC,users,username DESC,50608,1620,true,Single field descending
+Sort Only,users,username ASC,50608,1520,true,Pure sorting without filters
+Sort + Filter,users,username ASC,50608,1656,true,Sorting with WHERE clause
+Multi-Field,functions,user_id ASC, name ASC,128,185,true,Two-field composite sorting
