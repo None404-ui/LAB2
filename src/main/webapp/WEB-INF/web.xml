@@ -7,6 +7,42 @@
 
     <display-name>Math Functions API</display-name>
 
+    <!-- ========== FILTERS ========== -->
+
+    <!-- CORS Filter - разрешает跨域 запросы -->
+    <filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+        <init-param>
+            <param-name>cors.allowed.origins</param-name>
+            <param-value>*</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cors.allowed.methods</param-name>
+            <param-value>GET,POST,PUT,DELETE,OPTIONS</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cors.allowed.headers</param-name>
+            <param-value>Content-Type,Authorization</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ========== SERVLETS ========== -->
+
+    <!-- Auth Servlet - регистрация и вход -->
+    <servlet>
+        <servlet-name>AuthServlet</servlet-name>
+        <servlet-class>API.servlets.AuthServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthServlet</servlet-name>
+        <url-pattern>/api/v1/auth/*</url-pattern>
+    </servlet-mapping>
+
     <!-- User Servlet -->
     <servlet>
         <servlet-name>UserServlet</servlet-name>
