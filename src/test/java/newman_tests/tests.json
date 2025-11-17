@@ -1,0 +1,37 @@
+{
+  "info": {"name": "Math API Tests"},
+  "item": [
+    {
+      "name": "CREATE USER",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\"username\":\"test1\",\"email\":\"test1@test.com\",\"password\":\"123\"}"},
+        "url": {"raw": "http://localhost:8083/api/v1/users", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["api", "v1", "users"]}
+      }
+    },
+    {
+      "name": "GET ALL USERS",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "http://localhost:8083/api/v1/users", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["api", "v1", "users"]}
+      }
+    },
+    {
+      "name": "CREATE FUNCTION",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\"name\":\"func1\",\"expression\":\"x^2\",\"userId\":1}"},
+        "url": {"raw": "http://localhost:8083/api/v1/functions", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["api", "v1", "functions"]}
+      }
+    },
+    {
+      "name": "GET ALL FUNCTIONS",
+      "request": {
+        "method": "GET",
+        "url": {"raw": "http://localhost:8083/api/v1/functions", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["api", "v1", "functions"]}
+      }
+    }
+  ]
+}
