@@ -35,3 +35,5 @@ public interface ComputedPointRepository extends JpaRepository<ComputedPoint, Co
 
 
 
+
+
