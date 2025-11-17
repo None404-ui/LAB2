@@ -21,7 +21,6 @@ public class MathService {
         user.setUserId(nextUserId++);
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setCreatedAt(java.time.LocalDateTime.now());
         users.add(user);
         return user;
     }
@@ -36,7 +35,6 @@ public class MathService {
         function.setName(request.getName());
         function.setExpression(request.getExpression());
         function.setUserId(request.getUserId());
-        function.setCreatedAt(java.time.LocalDateTime.now());
         functions.add(function);
         return function;
     }
@@ -51,7 +49,6 @@ public class MathService {
         point.setFunctionId(request.getFunctionId());
         point.setXValue(request.getXValue());
         point.setYValue(request.getYValue());
-        point.setComputedAt(java.time.LocalDateTime.now());
         points.add(point);
         return point;
     }

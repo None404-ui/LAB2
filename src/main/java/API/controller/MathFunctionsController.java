@@ -10,7 +10,7 @@ public class MathFunctionsController {
     private final MathService mathService = new MathService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // === USERS ===
+    //USERS
     public String getUsers(int page, int size) throws Exception {
         List<UserResponse> users = mathService.getUsers(page, size);
         ApiResponse<List<UserResponse>> response = ApiResponse.success(users);
@@ -24,7 +24,7 @@ public class MathFunctionsController {
         return objectMapper.writeValueAsString(response);
     }
 
-    // === FUNCTIONS ===
+    //FUNCTIONS
     public String getFunctions(int page, int size) throws Exception {
         List<FunctionResponse> functions = mathService.getFunctions(page, size);
         ApiResponse<List<FunctionResponse>> response = ApiResponse.success(functions);
@@ -38,7 +38,7 @@ public class MathFunctionsController {
         return objectMapper.writeValueAsString(response);
     }
 
-    // === POINTS ===
+    //POINTS
     public String getPoints(int page, int size) throws Exception {
         List<PointResponse> points = mathService.getPoints(page, size);
         ApiResponse<List<PointResponse>> response = ApiResponse.success(points);
@@ -52,7 +52,6 @@ public class MathFunctionsController {
         return objectMapper.writeValueAsString(response);
     }
 
-    // Дополнительные методы...
     public String getUserFunctions(Integer userId) throws Exception {
         List<FunctionResponse> functions = mathService.getUserFunctions(userId);
         ApiResponse<List<FunctionResponse>> response = ApiResponse.success(functions);
