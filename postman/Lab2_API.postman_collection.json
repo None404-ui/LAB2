@@ -1,0 +1,515 @@
+{
+  "info": {
+    "_postman_id": "f3cf3a89-5fd0-4282-aefc-0a9d7bd086ab",
+    "name": "Lab2 API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"Success flag is true\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "});",
+                  "",
+                  "pm.test(\"Data is an array\", function () {",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(Array.isArray(jsonData.data)).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{uniqueUsername}}\",\n    \"email\": \"{{uniqueEmail}}\",\n    \"password\": \"P@ssw0rd123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"Success response contains user data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('userId');",
+                  "    pm.expect(jsonData.data).to.have.property('username');",
+                  "    pm.expect(jsonData.data).to.have.property('email');",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.userId) {",
+                  "    pm.collectionVariables.set('userId', jsonData.data.userId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Functions",
+      "item": [
+        {
+          "name": "Get All Functions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/functions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"Data array contains functions\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(Array.isArray(jsonData.data)).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Function",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const userId = pm.collectionVariables.get('userId');",
+                  "if (!userId) {",
+                  "    throw new Error('userId is not defined. Run Create User before Create Function.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"Function created successfully\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('functionId');",
+                  "    pm.expect(jsonData.data).to.have.property('userId');",
+                  "    pm.expect(jsonData.data).to.have.property('expression');",
+                  "});",
+                  "",
+                  "if (jsonData.data && jsonData.data.functionId) {",
+                  "    pm.collectionVariables.set('functionId', jsonData.data.functionId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Quadratic {{uniqueSuffix}}\",\n    \"expression\": \"x^2 + 3x + 2\",\n    \"userId\": {{userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/functions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Functions By User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const userId = pm.collectionVariables.get('userId');",
+                  "if (!userId) {",
+                  "    throw new Error('userId is not defined. Run Create User first.');",
+                  "}",
+                  "pm.variables.set('pathUserId', userId);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "const expectedUserId = Number(pm.collectionVariables.get('userId')) || null;",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"All functions belong to the requested user\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    if (Array.isArray(jsonData.data)) {",
+                  "        jsonData.data.forEach(fn => {",
+                  "            pm.expect(fn.userId).to.eql(expectedUserId);",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/functions/user/{{pathUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "functions",
+                "user",
+                "{{pathUserId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Computed Points",
+      "item": [
+        {
+          "name": "Get All Points",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "points"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"Data is an array of points\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(Array.isArray(jsonData.data)).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Point",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const functionId = pm.collectionVariables.get('functionId');",
+                  "if (!functionId) {",
+                  "    throw new Error('functionId is not defined. Run Create Function before Create Point.');",
+                  "}",
+                  "pm.variables.set('xValue', Number(pm.collectionVariables.get('xValue')) || 0);",
+                  "pm.variables.set('yValue', Number(pm.collectionVariables.get('yValue')) || 0);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"Point created with required data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('pointId');",
+                  "    pm.expect(jsonData.data).to.have.property('functionId');",
+                  "    pm.expect(jsonData.data).to.have.property('xValue');",
+                  "    pm.expect(jsonData.data).to.have.property('yValue');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"functionId\": {{functionId}},\n    \"xValue\": {{xValue}},\n    \"yValue\": {{yValue}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "points"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Points By Function",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const functionId = pm.collectionVariables.get('functionId');",
+                  "if (!functionId) {",
+                  "    throw new Error('functionId is not defined. Run Create Function before fetching points.');",
+                  "}",
+                  "pm.variables.set('pathFunctionId', functionId);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "const expectedFunctionId = Number(pm.collectionVariables.get('functionId')) || null;",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time under 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test(\"All points belong to the requested function\", function () {",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    if (Array.isArray(jsonData.data)) {",
+                  "        jsonData.data.forEach(point => {",
+                  "            pm.expect(point.functionId).to.eql(expectedFunctionId);",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/points/function/{{pathFunctionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "points",
+                "function",
+                "{{pathFunctionId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "const now = Date.now();",
+          "pm.collectionVariables.set('uniqueSuffix', now);",
+          "pm.collectionVariables.set('uniqueUsername', `test_user_${now}`);",
+          "pm.collectionVariables.set('uniqueEmail', `test_${now}@example.com`);",
+          "pm.collectionVariables.set('xValue', Number((Math.random() * 100).toFixed(2)));",
+          "pm.collectionVariables.set('yValue', Number((Math.random() * 100).toFixed(2)));"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "functionId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+

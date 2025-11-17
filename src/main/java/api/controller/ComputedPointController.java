@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class ComputedPointController {
     private ComputedPointService computedPointService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<ComputedPointDto>>> getAllPoints() {
         logger.info("Получен запрос на получение списка всех вычисленных точек");
         try {
@@ -35,6 +37,7 @@ public class ComputedPointController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<ComputedPointDto>> createPoint(@RequestBody CreateComputedPointRequest request) {
         logger.info("Получен запрос на создание вычисленной точки: functionId={}, x={}, y={}",
                    request.getFunctionId(), request.getXValue(), request.getYValue());
@@ -51,6 +54,7 @@ public class ComputedPointController {
     }
 
     @GetMapping("/function/{functionId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<List<ComputedPointDto>>> getFunctionPoints(@PathVariable Integer functionId) {
         logger.info("Получен запрос на получение вычисленных точек функции с ID: {}", functionId);
         try {

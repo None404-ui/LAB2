@@ -1,54 +1,133 @@
 package api.service;
 
 import api.dto.CreateUserRequest;
+import api.dto.UpdateUserRolesRequest;
 import api.dto.UserDto;
+import entities.Role;
+import entities.RoleName;
 import entities.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import repositories.RoleRepository;
 import repositories.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public List<UserDto> getAllUsers() {
+        logger.info("Fetching list of all users");
         return userRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     public UserDto createUser(CreateUserRequest request) {
-        // Проверяем, существует ли пользователь с таким username или email
+        logger.info("Creating user: username={}, email={}", request.getUsername(), request.getEmail());
+        validateCreateRequest(request);
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(resolveRoles(request.getRoles()));
+
+        User savedUser = userRepository.save(user);
+        logger.info("User created successfully with id={}", savedUser.getUserId());
+        return convertToDto(savedUser);
+    }
+
+    public UserDto updateUserRoles(Integer userId, UpdateUserRolesRequest request) {
+        Set<String> roles = request == null ? null : request.getRoles();
+        logger.info("Updating roles for userId={} with roles={}", userId, roles);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setRoles(resolveRoles(roles));
+        User savedUser = userRepository.save(user);
+        logger.info("Roles updated for userId={}", userId);
+        return convertToDto(savedUser);
+    }
+
+    private void validateCreateRequest(CreateUserRequest request) {
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new IllegalArgumentException("Username must not be empty");
+        }
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email must not be empty");
+        }
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password must not be empty");
+        }
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
+    }
 
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPasswordHash(request.getPassword()); // В реальном приложении нужно хэшировать пароль
+    private Set<Role> resolveRoles(Set<String> requestedRoles) {
+        Set<String> rolesInput = requestedRoles == null || requestedRoles.isEmpty()
+                ? Set.of(RoleName.ROLE_USER.name())
+                : requestedRoles;
 
-        User savedUser = userRepository.save(user);
-        return convertToDto(savedUser);
+        Set<Role> roles = new HashSet<>();
+        for (String roleValue : rolesInput) {
+            RoleName roleName = normalizeRoleName(roleValue);
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName.name()));
+            roles.add(role);
+        }
+        return roles;
+    }
+
+    private RoleName normalizeRoleName(String rawRole) {
+        if (rawRole == null || rawRole.isBlank()) {
+            throw new IllegalArgumentException("Role value must not be empty");
+        }
+        String normalized = rawRole.trim().toUpperCase(Locale.ROOT);
+        if (!normalized.startsWith("ROLE_")) {
+            normalized = "ROLE_" + normalized;
+        }
+        return RoleName.valueOf(normalized);
     }
 
     private UserDto convertToDto(User user) {
+        Set<String> roleNames = user.getRoles().stream()
+                .map(Role::getName)
+                .map(Enum::name)
+                .collect(Collectors.toSet());
         return new UserDto(
                 user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
-                LocalDateTime.now() // В реальном приложении нужно брать из БД
+                LocalDateTime.now(),
+                roleNames
         );
     }
 }

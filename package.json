@@ -1,0 +1,13 @@
+{
+  "name": "lab2-api-newman-suite",
+  "version": "1.0.0",
+  "description": "Newman test suite for LAB2 API with performance benchmarking.",
+  "scripts": {
+    "api:test": "node scripts/run-newman.js",
+    "api:test:quick": "API_BENCH_ITERATIONS=2 node scripts/run-newman.js"
+  },
+  "dependencies": {
+    "newman": "^6.2.1"
+  }
+}
+

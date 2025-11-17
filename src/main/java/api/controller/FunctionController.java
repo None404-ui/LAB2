@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class FunctionController {
     private FunctionService functionService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<FunctionDto>>> getAllFunctions() {
         logger.info("Получен запрос на получение списка всех функций");
         try {
@@ -35,6 +37,7 @@ public class FunctionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<FunctionDto>> createFunction(@RequestBody CreateFunctionRequest request) {
         logger.info("Получен запрос на создание функции: name={}, userId={}",
                    request.getName(), request.getUserId());
@@ -51,6 +54,7 @@ public class FunctionController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<List<FunctionDto>>> getUserFunctions(@PathVariable Integer userId) {
         logger.info("Получен запрос на получение функций пользователя с ID: {}", userId);
         try {
