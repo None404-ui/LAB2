@@ -1,5 +1,3 @@
-package main.java;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "config",
         "entities",
         "repositories",
-        "services",
-        "main.java"
+        "services"
 })
 public class Lab2Application {
 
