@@ -7,6 +7,10 @@
 
     <display-name>Math Functions API</display-name>
 
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
     <!-- ========== FILTERS ========== -->
 
     <!-- CORS Filter - разрешает跨域 запросы -->
