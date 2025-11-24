@@ -1,8 +1,6 @@
 package entities;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "functions")
@@ -20,18 +18,38 @@ public class Function {
     private User user;
 
     @Column(name = "expression", columnDefinition = "TEXT")
-    private String expression;
+    private String expression; // Для обратной совместимости (опционально)
 
-    @OneToMany(mappedBy = "function", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ComputedPoint> computedPoints = new ArrayList<>();
+    @Column(name = "function_type", length = 50)
+    private String functionType; // "ARRAY" или "LINKED_LIST"
+
+    @Column(name = "x_values", columnDefinition = "TEXT")
+    private String xValues; // JSON массив x значений
+
+    @Column(name = "y_values", columnDefinition = "TEXT")
+    private String yValues; // JSON массив y значений
+
+    @Column(name = "count")
+    private Integer count; // количество точек
 
     public Function() {
     }
 
+    // Старый конструктор для обратной совместимости
     public Function(String name, User user, String expression) {
         this.name = name;
         this.user = user;
         this.expression = expression;
+    }
+
+    // Новый конструктор для создания функций из массивов
+    public Function(String name, User user, String functionType, String xValues, String yValues, Integer count) {
+        this.name = name;
+        this.user = user;
+        this.functionType = functionType;
+        this.xValues = xValues;
+        this.yValues = yValues;
+        this.count = count;
     }
 
     public Integer getFunctionId() {
@@ -58,20 +76,44 @@ public class Function {
         this.user = user;
     }
 
+    public String getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(String functionType) {
+        this.functionType = functionType;
+    }
+
+    public String getXValues() {
+        return xValues;
+    }
+
+    public void setXValues(String xValues) {
+        this.xValues = xValues;
+    }
+
+    public String getYValues() {
+        return yValues;
+    }
+
+    public void setYValues(String yValues) {
+        this.yValues = yValues;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
     public String getExpression() {
         return expression;
     }
 
     public void setExpression(String expression) {
         this.expression = expression;
-    }
-
-    public List<ComputedPoint> getComputedPoints() {
-        return computedPoints;
-    }
-
-    public void setComputedPoints(List<ComputedPoint> computedPoints) {
-        this.computedPoints = computedPoints;
     }
 }
 

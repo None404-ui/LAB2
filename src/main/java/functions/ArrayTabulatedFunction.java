@@ -58,6 +58,12 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             xTo = temp;
         }
 
+        // Проверяем, что интервал не нулевой
+        if (xFrom == xTo) {
+            logger.error("Cannot create function: xFrom equals xTo ({})", xFrom);
+            throw new IllegalArgumentException("Начало и конец интервала не могут быть равны");
+        }
+
         this.count = count;
         this.xValues = new double[count];
         this.yValues = new double[count];

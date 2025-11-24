@@ -87,6 +87,12 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             xTo = temp;
         }
 
+        // Проверяем, что интервал не нулевой
+        if (xFrom == xTo) {
+            logger.error("Cannot create function: xFrom equals xTo ({})", xFrom);
+            throw new IllegalArgumentException("Начало и конец интервала не могут быть равны");
+        }
+
         this.count = count;
 
         // Заполняем xValues равномерно

@@ -1,5 +1,6 @@
 package functions.factory;
 
+import functions.MathFunction;
 import functions.TabulatedFunction;
 
 /**
@@ -13,5 +14,15 @@ public interface TabulatedFunctionFactory {
      * @return табулированная функция
      */
     TabulatedFunction create(double[] xValues, double[] yValues);
+
+    /**
+     * Создает табулированную функцию из MathFunction
+     * @param source исходная математическая функция
+     * @param xFrom начало интервала
+     * @param xTo конец интервала
+     * @param count количество точек разбиения
+     * @return табулированная функция
+     */
+    TabulatedFunction create(MathFunction source, double xFrom, double xTo, int count);
 }
 

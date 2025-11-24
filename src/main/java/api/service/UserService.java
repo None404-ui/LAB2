@@ -1,6 +1,7 @@
 package api.service;
 
 import api.dto.CreateUserRequest;
+import api.dto.RegisterRequest;
 import api.dto.UpdateUserRolesRequest;
 import api.dto.UserDto;
 import entities.Role;
@@ -58,6 +59,42 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         logger.info("User created successfully with id={}", savedUser.getUserId());
+        return convertToDto(savedUser);
+    }
+
+    public UserDto registerUser(RegisterRequest request) {
+        logger.info("Registering new user: username={}, email={}", request.getUsername(), request.getEmail());
+        
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя пользователя не может быть пустым");
+        }
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email не может быть пустым");
+        }
+        if (request.getPassword() == null || request.getPassword().length() < 6) {
+            throw new IllegalArgumentException("Пароль должен содержать минимум 6 символов");
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Пользователь с таким именем уже существует");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Пользователь с таким email уже существует");
+        }
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        
+        // По умолчанию назначаем роль USER
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow(() -> new IllegalArgumentException("Role USER not found"));
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+
+        User savedUser = userRepository.save(user);
+        logger.info("User registered successfully with id={}", savedUser.getUserId());
         return convertToDto(savedUser);
     }
 
