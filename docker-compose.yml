@@ -18,11 +18,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - lab2-network
 
-  # Spring Boot приложение
+  # Spring Boot приложение + React frontend
   app:
-    build: .
-    container_name: lab_m
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: lab2-app
     ports:
       - "8080:8080"
     depends_on:
@@ -32,9 +36,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/laba
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - lab2-network
+    restart: unless-stopped
+
+networks:
+  lab2-network:
+    driver: bridge
 
 volumes:
   postgres_data:
-
-
-

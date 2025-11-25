@@ -179,6 +179,23 @@ public class FunctionController {
         }
     }
 
+    @PutMapping("/by-id/{functionId}/name")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<FunctionDto>> updateName(
+            @PathVariable Integer functionId,
+            @RequestBody java.util.Map<String, String> request) {
+        String newName = request.get("name");
+        logger.info("Получен запрос на изменение имени функции {} на '{}'", functionId, newName);
+        try {
+            FunctionDto result = functionService.updateName(functionId, newName);
+            logger.info("Имя функции {} изменено на '{}'", functionId, newName);
+            return ResponseEntity.ok(ApiResponse.success(result));
+        } catch (Exception e) {
+            logger.error("Ошибка при изменении имени: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
     @PostMapping("/by-id/{functionId}/apply")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<ApplyResponse>> applyFunction(
@@ -226,5 +243,60 @@ public class FunctionController {
             logger.error("Ошибка при удалении точки: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
+    }
+
+    @DeleteMapping("/by-id/{functionId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<Void>> deleteFunction(@PathVariable Integer functionId) {
+        logger.info("Получен запрос на удаление функции {}", functionId);
+        try {
+            functionService.deleteFunction(functionId);
+            logger.info("Функция {} успешно удалена", functionId);
+            return ResponseEntity.ok(ApiResponse.success(null));
+        } catch (Exception e) {
+            logger.error("Ошибка при удалении функции: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/by-id/{functionId}/integrate")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> calculateIntegral(
+            @PathVariable Integer functionId,
+            @RequestBody java.util.Map<String, Integer> request) {
+        int threadCount = request.getOrDefault("threadCount", 4);
+        logger.info("Получен запрос на вычисление интеграла функции {} с {} потоками", functionId, threadCount);
+        try {
+            java.util.Map<String, Object> result = functionService.calculateIntegral(functionId, threadCount);
+            logger.info("Интеграл функции {} вычислен: {}", functionId, result.get("result"));
+            return ResponseEntity.ok(ApiResponse.success(result));
+        } catch (Exception e) {
+            logger.error("Ошибка при вычислении интеграла: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/composite")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> createCompositeFunction(
+            @RequestBody java.util.Map<String, Object> request) {
+        String name = (String) request.get("name");
+        String innerFunctionName = (String) request.get("innerFunction");
+        String outerFunctionName = (String) request.get("outerFunction");
+        logger.info("Получен запрос на создание составной функции: {} = {} ∘ {}", name, outerFunctionName, innerFunctionName);
+        try {
+            java.util.Map<String, Object> result = functionService.createCompositeFunction(name, innerFunctionName, outerFunctionName);
+            logger.info("Составная функция '{}' создана", name);
+            return ResponseEntity.ok(ApiResponse.success(result));
+        } catch (Exception e) {
+            logger.error("Ошибка при создании составной функции: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/max-threads")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<Integer>> getMaxThreads() {
+        return ResponseEntity.ok(ApiResponse.success(concurrent.IntegralCalculator.getMaxThreads()));
     }
 }

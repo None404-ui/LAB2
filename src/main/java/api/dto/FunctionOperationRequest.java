@@ -1,10 +1,21 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class FunctionOperationRequest {
+    @JsonProperty("functionId1")
     private Integer functionId1;
+    
+    @JsonProperty("functionId2")
     private Integer functionId2;
+    
+    @JsonProperty("operation")
     private String operation; // "ADD", "SUBTRACT", "MULTIPLY", "DIVIDE"
+    
+    @JsonProperty("resultName")
     private String resultName;
+    
+    @JsonProperty("factoryType")
     private String factoryType; // "ARRAY" или "LINKED_LIST"
 
     public FunctionOperationRequest() {}

@@ -1,8 +1,15 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class DifferentiateRequest {
+    @JsonProperty("functionId")
     private Integer functionId;
+    
+    @JsonProperty("resultName")
     private String resultName;
+    
+    @JsonProperty("factoryType")
     private String factoryType; // "ARRAY" или "LINKED_LIST"
 
     public DifferentiateRequest() {}

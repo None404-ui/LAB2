@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import repositories.FunctionRepository;
 import repositories.UserRepository;
 
+import org.reflections.Reflections;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,17 +47,84 @@ public class FunctionService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Map для доступных математических функций
+    // Map для доступных математических функций (заполняется через рефлексию)
     private final Map<String, MathFunction> mathFunctions = createMathFunctionsMap();
+    
+    // Map для пользовательских составных функций
+    private final Map<String, MathFunction> customCompositeFunctions = new LinkedHashMap<>();
 
+    /**
+     * Сканирует пакет functions с помощью рефлексии и находит все классы
+     * с аннотацией @MathFunctionInfo
+     */
     private Map<String, MathFunction> createMathFunctionsMap() {
         Map<String, MathFunction> map = new LinkedHashMap<>();
-        map.put("Квадратичная функция", new SqrFunction());
-        map.put("Тождественная функция", new IdentityFunction());
-        map.put("Единичная функция", new UnitFunction());
-        map.put("Нулевая функция", new ZeroFunction());
-        map.put("Константная функция", new ConstantFunction(1.0));
+        
+        try {
+            Reflections reflections = new Reflections("functions");
+            Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(MathFunctionInfo.class);
+            
+            // Создаем список для сортировки по приоритету и имени
+            List<Map.Entry<String, MathFunction>> entries = new ArrayList<>();
+            
+            for (Class<?> clazz : annotatedClasses) {
+                if (MathFunction.class.isAssignableFrom(clazz)) {
+                    MathFunctionInfo info = clazz.getAnnotation(MathFunctionInfo.class);
+                    try {
+                        MathFunction instance = (MathFunction) clazz.getDeclaredConstructor().newInstance();
+                        entries.add(new AbstractMap.SimpleEntry<>(info.name(), instance));
+                        logger.info("Найдена функция: {} (приоритет: {})", info.name(), info.priority());
+                    } catch (Exception e) {
+                        logger.warn("Не удалось создать экземпляр функции {}: {}", clazz.getName(), e.getMessage());
+                    }
+                }
+            }
+            
+            // Сортируем по приоритету, затем по алфавиту
+            entries.sort((e1, e2) -> {
+                MathFunctionInfo info1 = e1.getValue().getClass().getAnnotation(MathFunctionInfo.class);
+                MathFunctionInfo info2 = e2.getValue().getClass().getAnnotation(MathFunctionInfo.class);
+                int priorityCompare = Integer.compare(
+                    info1 != null ? info1.priority() : 100,
+                    info2 != null ? info2.priority() : 100
+                );
+                if (priorityCompare != 0) return priorityCompare;
+                return e1.getKey().compareTo(e2.getKey());
+            });
+            
+            for (Map.Entry<String, MathFunction> entry : entries) {
+                map.put(entry.getKey(), entry.getValue());
+            }
+            
+            logger.info("Загружено {} математических функций через рефлексию", map.size());
+            
+        } catch (Exception e) {
+            logger.error("Ошибка при сканировании функций через рефлексию: {}", e.getMessage());
+            // Fallback на захардкоженный список
+            map.put("Квадратичная функция (x²)", new SqrFunction());
+            map.put("Тождественная функция (x)", new IdentityFunction());
+            map.put("Единичная функция (1)", new UnitFunction());
+            map.put("Нулевая функция (0)", new ZeroFunction());
+        }
+        
         return map;
+    }
+    
+    /**
+     * Добавляет пользовательскую составную функцию в список доступных
+     */
+    public void addCompositeFunction(String name, MathFunction function) {
+        customCompositeFunctions.put(name, function);
+        logger.info("Добавлена составная функция: {}", name);
+    }
+    
+    /**
+     * Получает все доступные функции (встроенные + пользовательские)
+     */
+    private Map<String, MathFunction> getAllMathFunctions() {
+        Map<String, MathFunction> all = new LinkedHashMap<>(mathFunctions);
+        all.putAll(customCompositeFunctions);
+        return all;
     }
 
     private TabulatedFunctionFactory getFactory(String functionType) {
@@ -65,7 +134,7 @@ public class FunctionService {
     }
 
     public List<String> getAvailableMathFunctions() {
-        return new ArrayList<>(mathFunctions.keySet());
+        return new ArrayList<>(getAllMathFunctions().keySet());
     }
 
     public List<FunctionDto> getAllFunctions() {
@@ -172,10 +241,11 @@ public class FunctionService {
         }
 
         // Получение математической функции (валидация происходит в конструкторах)
-        MathFunction mathFunction = mathFunctions.get(request.getMathFunctionType());
+        Map<String, MathFunction> allFunctions = getAllMathFunctions();
+        MathFunction mathFunction = allFunctions.get(request.getMathFunctionType());
         logger.info("Found mathFunction: {}", mathFunction != null ? mathFunction.getClass().getSimpleName() : "NULL");
         if (mathFunction == null) {
-            logger.error("Available math functions: {}", mathFunctions.keySet());
+            logger.error("Available math functions: {}", allFunctions.keySet());
             throw new IllegalArgumentException("Неизвестный тип математической функции: " + request.getMathFunctionType());
         }
 
@@ -496,6 +566,26 @@ public class FunctionService {
         }
     }
 
+    public FunctionDto updateName(Integer functionId, String newName) {
+        Integer targetUserId = currentUserService.getCurrentUserId();
+        
+        Function function = functionRepository.findById(functionId)
+                .orElseThrow(() -> new IllegalArgumentException("Функция не найдена"));
+        
+        if (!function.getUser().getUserId().equals(targetUserId)) {
+            throw new IllegalArgumentException("Нет доступа к этой функции");
+        }
+        
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Имя функции не может быть пустым");
+        }
+        
+        function.setName(newName.trim());
+        Function saved = functionRepository.save(function);
+        logger.info("Function {} name updated to '{}'", functionId, newName);
+        return convertToDto(saved);
+    }
+
     public FunctionDto updateYValues(Integer functionId, double[] newYValues) {
         Integer targetUserId = currentUserService.getCurrentUserId();
         
@@ -631,5 +721,96 @@ public class FunctionService {
         }
         
         return yValues;
+    }
+
+    public void deleteFunction(Integer functionId) {
+        Integer targetUserId = currentUserService.getCurrentUserId();
+        
+        Function function = functionRepository.findById(functionId)
+                .orElseThrow(() -> new IllegalArgumentException("Функция не найдена"));
+        
+        if (!function.getUser().getUserId().equals(targetUserId)) {
+            throw new IllegalArgumentException("Нет доступа к этой функции");
+        }
+        
+        // Удаляем составную функцию из списка, если она там есть
+        String functionName = function.getName();
+        if (customCompositeFunctions.containsKey(functionName)) {
+            customCompositeFunctions.remove(functionName);
+            logger.info("Составная функция '{}' удалена из списка доступных", functionName);
+        }
+        
+        functionRepository.delete(function);
+        logger.info("Функция {} удалена пользователем {}", functionId, targetUserId);
+    }
+
+    /**
+     * Вычисляет определённый интеграл функции параллельно
+     */
+    public Map<String, Object> calculateIntegral(Integer functionId, int threadCount) throws Exception {
+        Integer targetUserId = currentUserService.getCurrentUserId();
+        
+        Function function = functionRepository.findById(functionId)
+                .orElseThrow(() -> new IllegalArgumentException("Функция не найдена"));
+        
+        if (!function.getUser().getUserId().equals(targetUserId)) {
+            throw new IllegalArgumentException("Нет доступа к этой функции");
+        }
+        
+        double[] xValues = objectMapper.readValue(function.getXValues(), double[].class);
+        double[] yValues = objectMapper.readValue(function.getYValues(), double[].class);
+        
+        TabulatedFunctionFactory factory = getFactory(function.getFunctionType());
+        TabulatedFunction tabFunc = factory.create(xValues, yValues);
+        
+        long startTime = System.currentTimeMillis();
+        double result = concurrent.IntegralCalculator.calculate(tabFunc, threadCount);
+        long endTime = System.currentTimeMillis();
+        
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("functionId", functionId);
+        response.put("functionName", function.getName());
+        response.put("from", xValues[0]);
+        response.put("to", xValues[xValues.length - 1]);
+        response.put("result", result);
+        response.put("threadCount", threadCount);
+        response.put("timeMs", endTime - startTime);
+        
+        logger.info("Интеграл функции {} вычислен за {} мс: {}", functionId, endTime - startTime, result);
+        
+        return response;
+    }
+
+    /**
+     * Создаёт составную функцию (композицию) из двух функций
+     */
+    public Map<String, Object> createCompositeFunction(String name, String innerFunctionName, String outerFunctionName) {
+        Map<String, MathFunction> allFunctions = getAllMathFunctions();
+        
+        MathFunction innerFunction = allFunctions.get(innerFunctionName);
+        MathFunction outerFunction = allFunctions.get(outerFunctionName);
+        
+        if (innerFunction == null) {
+            throw new IllegalArgumentException("Внутренняя функция не найдена: " + innerFunctionName);
+        }
+        if (outerFunction == null) {
+            throw new IllegalArgumentException("Внешняя функция не найдена: " + outerFunctionName);
+        }
+        
+        // Создаём композицию: outer(inner(x))
+        CompositeFunction composite = new CompositeFunction(innerFunction, outerFunction);
+        
+        // Добавляем в список пользовательских функций
+        addCompositeFunction(name, composite);
+        
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("name", name);
+        response.put("innerFunction", innerFunctionName);
+        response.put("outerFunction", outerFunctionName);
+        response.put("description", outerFunctionName + " ∘ " + innerFunctionName);
+        
+        logger.info("Создана составная функция: {} = {} ∘ {}", name, outerFunctionName, innerFunctionName);
+        
+        return response;
     }
 }
