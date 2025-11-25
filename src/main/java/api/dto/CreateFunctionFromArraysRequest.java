@@ -1,11 +1,17 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
 
 public class CreateFunctionFromArraysRequest {
     private String name;
+    
+    @JsonProperty("xValues")
     private double[] xValues;
+    
+    @JsonProperty("yValues")
     private double[] yValues;
+    
     private String factoryType;
 
     public CreateFunctionFromArraysRequest() {}
@@ -22,6 +28,7 @@ public class CreateFunctionFromArraysRequest {
         return xValues;
     }
 
+    @JsonProperty("xValues")
     public void setXValues(double[] xValues) {
         this.xValues = xValues;
     }
@@ -30,6 +37,7 @@ public class CreateFunctionFromArraysRequest {
         return yValues;
     }
 
+    @JsonProperty("yValues")
     public void setYValues(double[] yValues) {
         this.yValues = yValues;
     }

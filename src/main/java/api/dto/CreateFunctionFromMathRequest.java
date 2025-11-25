@@ -1,23 +1,21 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CreateFunctionFromMathRequest {
     private String name;
-    private String mathFunctionType; // "SQR", "IDENTITY", "CONSTANT", "UNIT", "ZERO"
+    private String mathFunctionType;
+    
+    @JsonProperty("xFrom")
     private double xFrom;
+    
+    @JsonProperty("xTo")
     private double xTo;
+    
     private int count;
-    private String factoryType; // "ARRAY" или "LINKED_LIST"
+    private String factoryType;
 
     public CreateFunctionFromMathRequest() {}
-
-    public CreateFunctionFromMathRequest(String name, String mathFunctionType, double xFrom, double xTo, int count, String factoryType) {
-        this.name = name;
-        this.mathFunctionType = mathFunctionType;
-        this.xFrom = xFrom;
-        this.xTo = xTo;
-        this.count = count;
-        this.factoryType = factoryType;
-    }
 
     public String getName() {
         return name;
@@ -39,6 +37,7 @@ public class CreateFunctionFromMathRequest {
         return xFrom;
     }
 
+    @JsonProperty("xFrom")
     public void setXFrom(double xFrom) {
         this.xFrom = xFrom;
     }
@@ -47,6 +46,7 @@ public class CreateFunctionFromMathRequest {
         return xTo;
     }
 
+    @JsonProperty("xTo")
     public void setXTo(double xTo) {
         this.xTo = xTo;
     }
@@ -65,6 +65,18 @@ public class CreateFunctionFromMathRequest {
 
     public void setFactoryType(String factoryType) {
         this.factoryType = factoryType;
+    }
+    
+    @Override
+    public String toString() {
+        return "CreateFunctionFromMathRequest{" +
+                "name='" + name + '\'' +
+                ", mathFunctionType='" + mathFunctionType + '\'' +
+                ", xFrom=" + xFrom +
+                ", xTo=" + xTo +
+                ", count=" + count +
+                ", factoryType='" + factoryType + '\'' +
+                '}';
     }
 }
 

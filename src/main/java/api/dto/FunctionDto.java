@@ -1,17 +1,27 @@
 package api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public class FunctionDto {
     private Integer functionId;
     private String name;
     private String functionType;
+    
+    @JsonProperty("xValues")
     private double[] xValues;
+    
+    @JsonProperty("yValues")
     private double[] yValues;
+    
     private Integer count;
     private Integer userId;
     private LocalDateTime createdAt;
+    
+    @JsonProperty("isInsertable")
     private boolean isInsertable;
+    
+    @JsonProperty("isRemovable")
     private boolean isRemovable;
 
     public FunctionDto() {}
@@ -53,18 +63,22 @@ public class FunctionDto {
         this.functionType = functionType;
     }
 
+    @JsonProperty("xValues")
     public double[] getXValues() {
         return xValues;
     }
 
+    @JsonProperty("xValues")
     public void setXValues(double[] xValues) {
         this.xValues = xValues;
     }
 
+    @JsonProperty("yValues")
     public double[] getYValues() {
         return yValues;
     }
 
+    @JsonProperty("yValues")
     public void setYValues(double[] yValues) {
         this.yValues = yValues;
     }
@@ -93,6 +107,7 @@ public class FunctionDto {
         this.createdAt = createdAt;
     }
 
+    @JsonProperty("isInsertable")
     public boolean isInsertable() {
         return isInsertable;
     }
@@ -101,6 +116,7 @@ public class FunctionDto {
         isInsertable = insertable;
     }
 
+    @JsonProperty("isRemovable")
     public boolean isRemovable() {
         return isRemovable;
     }

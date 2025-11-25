@@ -160,6 +160,10 @@ public class FunctionService {
     }
 
     public FunctionDto createFunctionFromMath(CreateFunctionFromMathRequest request) {
+        logger.info("createFunctionFromMath: name={}, type={}, xFrom={}, xTo={}, count={}, factory={}", 
+                   request.getName(), request.getMathFunctionType(), 
+                   request.getXFrom(), request.getXTo(), request.getCount(), request.getFactoryType());
+        
         Integer targetUserId = currentUserService.getCurrentUserId();
         
         Optional<User> user = userRepository.findById(targetUserId);
@@ -169,7 +173,9 @@ public class FunctionService {
 
         // Получение математической функции (валидация происходит в конструкторах)
         MathFunction mathFunction = mathFunctions.get(request.getMathFunctionType());
+        logger.info("Found mathFunction: {}", mathFunction != null ? mathFunction.getClass().getSimpleName() : "NULL");
         if (mathFunction == null) {
+            logger.error("Available math functions: {}", mathFunctions.keySet());
             throw new IllegalArgumentException("Неизвестный тип математической функции: " + request.getMathFunctionType());
         }
 
@@ -526,9 +532,12 @@ public class FunctionService {
             String functionType = function.getFunctionType();
             
             // Проверяем есть ли новые данные (xValues, yValues)
+            logger.debug("Converting function {}: xValues={}, yValues={}", 
+                        function.getFunctionId(), function.getXValues(), function.getYValues());
             if (function.getXValues() != null && function.getYValues() != null) {
                 xValues = objectMapper.readValue(function.getXValues(), double[].class);
                 yValues = objectMapper.readValue(function.getYValues(), double[].class);
+                logger.debug("Parsed xValues: {}, yValues: {}", Arrays.toString(xValues), Arrays.toString(yValues));
             } else if (function.getExpression() != null && !function.getExpression().isEmpty()) {
                 // Старая функция с expression - генерируем точки
                 // Парсим expression типа "f(x)=x^2" или просто используем имя
