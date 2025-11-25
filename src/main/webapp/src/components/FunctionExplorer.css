@@ -1,0 +1,153 @@
+.function-explorer {
+  max-width: 1000px !important;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.function-loader {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.function-loader h3 {
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.load-options {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.load-option {
+  text-align: left;
+}
+
+.load-option label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.function-content {
+  padding: 20px 0;
+}
+
+.function-info-panel {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.function-info-panel h3 {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+}
+
+.info-badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.function-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.function-actions .btn {
+  flex: 1;
+  min-width: 150px;
+}
+
+.chart-container {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #f0f0f0;
+}
+
+.apply-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9ff;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.apply-section h3 {
+  color: #333;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.apply-controls {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.apply-controls .form-group {
+  flex: 1;
+  min-width: 120px;
+  margin: 0;
+}
+
+.apply-controls .form-group input {
+  width: 100%;
+  min-width: 80px;
+  box-sizing: border-box;
+}
+
+.apply-controls .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: 120px;
+  padding: 12px 20px;
+}
+
+.apply-result {
+  margin-top: 15px;
+  padding: 15px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+  color: #2e7d32;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .apply-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .apply-controls .btn {
+    width: 100%;
+  }
+
+  .function-actions .btn {
+    min-width: unset;
+  }
+}
+
+
+

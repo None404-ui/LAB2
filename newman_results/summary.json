@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2025-11-18T11:34:45.701Z",
+  "iterations": 5,
+  "requests": [
+    {
+      "label": "Get All Users",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/users",
+      "stats": {
+        "average": 16.8,
+        "median": 4,
+        "p95": 71,
+        "min": 2,
+        "max": 71,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Create User",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/users",
+      "stats": {
+        "average": 4.8,
+        "median": 4,
+        "p95": 7,
+        "min": 4,
+        "max": 7,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Get All Functions",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/functions",
+      "stats": {
+        "average": 3.8,
+        "median": 4,
+        "p95": 5,
+        "min": 3,
+        "max": 5,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Create Function",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/functions",
+      "stats": {
+        "average": 3.4,
+        "median": 3,
+        "p95": 7,
+        "min": 2,
+        "max": 7,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Get Functions By User",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/functions/user/%7B%7BpathUserId%7D%7D",
+      "stats": {
+        "average": 4,
+        "median": 3,
+        "p95": 7,
+        "min": 2,
+        "max": 7,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Get All Points",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/points",
+      "stats": {
+        "average": 2.6,
+        "median": 3,
+        "p95": 3,
+        "min": 2,
+        "max": 3,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Create Point",
+      "method": "POST",
+      "url": "http://localhost:8080/api/v1/points",
+      "stats": {
+        "average": 3.8,
+        "median": 3,
+        "p95": 8,
+        "min": 2,
+        "max": 8,
+        "samples": 5
+      },
+      "successRate": 0
+    },
+    {
+      "label": "Get Points By Function",
+      "method": "GET",
+      "url": "http://localhost:8080/api/v1/points/function/%7B%7BpathFunctionId%7D%7D",
+      "stats": {
+        "average": 4.6,
+        "median": 3,
+        "p95": 10,
+        "min": 3,
+        "max": 10,
+        "samples": 5
+      },
+      "successRate": 0
+    }
+  ]
+}
