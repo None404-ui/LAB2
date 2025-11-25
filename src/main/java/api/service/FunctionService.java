@@ -109,6 +109,8 @@ public class FunctionService {
     }
 
     public FunctionDto createFunctionFromArrays(CreateFunctionFromArraysRequest request) {
+        logger.info("createFunctionFromArrays called with: {}", request);
+        
         Integer targetUserId = currentUserService.getCurrentUserId();
         
         Optional<User> user = userRepository.findById(targetUserId);
@@ -116,16 +118,23 @@ public class FunctionService {
             throw new IllegalArgumentException("User not found");
         }
 
+        double[] xValues = request.getXValues();
+        double[] yValues = request.getYValues();
+
         // Базовая валидация
-        if (request.getXValues() == null || request.getYValues() == null) {
+        if (xValues == null || yValues == null) {
+            logger.error("xValues or yValues is null! xValues={}, yValues={}", xValues, yValues);
             throw new IllegalArgumentException("Массивы x и y не могут быть null");
+        }
+        
+        if (xValues.length == 0 || yValues.length == 0) {
+            throw new IllegalArgumentException("Массивы x и y не могут быть пустыми");
         }
 
         // Выбор фабрики и валидация данных через создание функции
-        // Конструктор сам проверит: длину массивов, минимум точек, сортировку
         TabulatedFunctionFactory factory = getFactory(request.getFactoryType());
         try {
-            factory.create(request.getXValues(), request.getYValues());
+            factory.create(xValues, yValues);
         } catch (Exception validationError) {
             logger.error("Validation error in constructor: {}", validationError.getMessage());
             throw new IllegalArgumentException(validationError.getMessage());
@@ -137,9 +146,9 @@ public class FunctionService {
             function.setName(request.getName());
             function.setUser(user.get());
             function.setFunctionType(request.getFactoryType() != null ? request.getFactoryType() : "ARRAY");
-            function.setXValues(objectMapper.writeValueAsString(request.getXValues()));
-            function.setYValues(objectMapper.writeValueAsString(request.getYValues()));
-            function.setCount(request.getXValues().length);
+            function.setXValues(objectMapper.writeValueAsString(xValues));
+            function.setYValues(objectMapper.writeValueAsString(yValues));
+            function.setCount(xValues.length);
 
             Function savedFunction = functionRepository.save(function);
             logger.info("Function {} created from arrays for user {}", savedFunction.getFunctionId(), targetUserId);
@@ -204,6 +213,7 @@ public class FunctionService {
 
     public FunctionDto getFunctionById(Integer functionId) {
         Integer targetUserId = currentUserService.getCurrentUserId();
+        boolean isAdmin = currentUserService.hasRole(RoleName.ROLE_ADMIN);
         
         Optional<Function> functionOpt = functionRepository.findById(functionId);
         if (functionOpt.isEmpty()) {
@@ -211,7 +221,8 @@ public class FunctionService {
         }
         
         Function function = functionOpt.get();
-        if (!function.getUser().getUserId().equals(targetUserId)) {
+        // Админ может видеть все функции, обычный пользователь - только свои
+        if (!isAdmin && !function.getUser().getUserId().equals(targetUserId)) {
             throw new IllegalArgumentException("Нет доступа к этой функции");
         }
         
@@ -220,11 +231,12 @@ public class FunctionService {
 
     public double applyFunction(Integer functionId, double x) {
         Integer targetUserId = currentUserService.getCurrentUserId();
+        boolean isAdmin = currentUserService.hasRole(RoleName.ROLE_ADMIN);
         
         Function function = functionRepository.findById(functionId)
                 .orElseThrow(() -> new IllegalArgumentException("Функция не найдена"));
         
-        if (!function.getUser().getUserId().equals(targetUserId)) {
+        if (!isAdmin && !function.getUser().getUserId().equals(targetUserId)) {
             throw new IllegalArgumentException("Нет доступа к этой функции");
         }
         
@@ -508,12 +520,29 @@ public class FunctionService {
 
     private FunctionDto convertToDto(Function function) {
         try {
-            double[] xValues = function.getXValues() != null 
-                    ? objectMapper.readValue(function.getXValues(), double[].class) 
-                    : new double[0];
-            double[] yValues = function.getYValues() != null 
-                    ? objectMapper.readValue(function.getYValues(), double[].class) 
-                    : new double[0];
+            double[] xValues;
+            double[] yValues;
+            Integer count = function.getCount();
+            String functionType = function.getFunctionType();
+            
+            // Проверяем есть ли новые данные (xValues, yValues)
+            if (function.getXValues() != null && function.getYValues() != null) {
+                xValues = objectMapper.readValue(function.getXValues(), double[].class);
+                yValues = objectMapper.readValue(function.getYValues(), double[].class);
+            } else if (function.getExpression() != null && !function.getExpression().isEmpty()) {
+                // Старая функция с expression - генерируем точки
+                // Парсим expression типа "f(x)=x^2" или просто используем имя
+                xValues = new double[]{0, 1, 2, 3, 4, 5};
+                yValues = generateYValuesFromExpression(function.getExpression(), xValues);
+                count = xValues.length;
+                if (functionType == null) {
+                    functionType = "LINKED_LIST"; // По умолчанию для старых функций
+                }
+            } else {
+                // Нет данных - пустые массивы
+                xValues = new double[0];
+                yValues = new double[0];
+            }
             
             // Проверяем, реализует ли функция Insertable и Removable
             boolean isInsertable = false;
@@ -521,7 +550,7 @@ public class FunctionService {
             
             if (xValues.length >= 2 && yValues.length >= 2) {
                 try {
-                    TabulatedFunctionFactory factory = getFactory(function.getFunctionType());
+                    TabulatedFunctionFactory factory = getFactory(functionType);
                     TabulatedFunction tempFunc = factory.create(xValues, yValues);
                     isInsertable = tempFunc instanceof Insertable;
                     isRemovable = tempFunc instanceof Removable;
@@ -533,10 +562,10 @@ public class FunctionService {
             return new FunctionDto(
                     function.getFunctionId(),
                     function.getName(),
-                    function.getFunctionType(),
+                    functionType,
                     xValues,
                     yValues,
-                    function.getCount(),
+                    count != null ? count : xValues.length,
                     function.getUser().getUserId(),
                     LocalDateTime.now(),
                     isInsertable,
@@ -546,5 +575,52 @@ public class FunctionService {
             logger.error("Error converting function to DTO", e);
             throw new RuntimeException("Ошибка при преобразовании функции");
         }
+    }
+    
+    /**
+     * Генерирует Y значения на основе expression (для старых функций)
+     */
+    private double[] generateYValuesFromExpression(String expression, double[] xValues) {
+        double[] yValues = new double[xValues.length];
+        
+        // Простой парсер для базовых выражений
+        String expr = expression.toLowerCase().replace(" ", "");
+        
+        // Убираем "f(x)=" если есть
+        if (expr.contains("=")) {
+            expr = expr.substring(expr.indexOf("=") + 1);
+        }
+        
+        for (int i = 0; i < xValues.length; i++) {
+            double x = xValues[i];
+            try {
+                if (expr.equals("x^2") || expr.equals("x*x")) {
+                    yValues[i] = x * x;
+                } else if (expr.equals("x^3") || expr.equals("x*x*x")) {
+                    yValues[i] = x * x * x;
+                } else if (expr.equals("x")) {
+                    yValues[i] = x;
+                } else if (expr.equals("sin(x)")) {
+                    yValues[i] = Math.sin(x);
+                } else if (expr.equals("cos(x)")) {
+                    yValues[i] = Math.cos(x);
+                } else if (expr.equals("exp(x)") || expr.equals("e^x")) {
+                    yValues[i] = Math.exp(x);
+                } else if (expr.equals("sqrt(x)")) {
+                    yValues[i] = Math.sqrt(x);
+                } else if (expr.equals("1") || expr.equals("1.0")) {
+                    yValues[i] = 1.0;
+                } else if (expr.equals("0") || expr.equals("0.0")) {
+                    yValues[i] = 0.0;
+                } else {
+                    // По умолчанию - линейная функция
+                    yValues[i] = x;
+                }
+            } catch (Exception e) {
+                yValues[i] = x; // Fallback
+            }
+        }
+        
+        return yValues;
     }
 }

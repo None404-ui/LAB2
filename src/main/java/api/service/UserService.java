@@ -4,6 +4,7 @@ import api.dto.CreateUserRequest;
 import api.dto.RegisterRequest;
 import api.dto.UpdateUserRolesRequest;
 import api.dto.UserDto;
+import api.security.CurrentUserService;
 import entities.Role;
 import entities.RoleName;
 import entities.User;
@@ -31,13 +32,21 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       CurrentUserService currentUserService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.currentUserService = currentUserService;
+    }
+
+    public UserDto getCurrentUser() {
+        User user = currentUserService.getCurrentUser();
+        return convertToDto(user);
     }
 
     public List<UserDto> getAllUsers() {

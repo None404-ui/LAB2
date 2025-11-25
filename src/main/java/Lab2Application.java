@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         "config",
         "entities",
         "repositories",
-        "services"
+        "services",
+        "functions",
+        "operations",
+        "exceptions"
 })
 public class Lab2Application {
 

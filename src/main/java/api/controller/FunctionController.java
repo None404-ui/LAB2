@@ -66,10 +66,11 @@ public class FunctionController {
         }
     }
 
-    @PostMapping("/from-arrays")
+    @PostMapping("/create-from-arrays")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<FunctionDto>> createFunctionFromArrays(@RequestBody CreateFunctionFromArraysRequest request) {
-        logger.info("Получен запрос на создание функции из массивов: name={}", request.getName());
+        logger.info("=== CREATE FROM ARRAYS REQUEST ===");
+        logger.info("Request object: {}", request);
         try {
             FunctionDto function = functionService.createFunctionFromArrays(request);
             logger.info("Успешно создана функция из массивов с ID: {}", function.getFunctionId());
@@ -80,7 +81,7 @@ public class FunctionController {
         }
     }
 
-    @PostMapping("/from-math")
+    @PostMapping("/create-from-math")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<FunctionDto>> createFunctionFromMath(@RequestBody CreateFunctionFromMathRequest request) {
         logger.info("Получен запрос на создание функции из математической функции: name={}, type={}", 
@@ -95,7 +96,7 @@ public class FunctionController {
         }
     }
 
-    @GetMapping("/math-functions")
+    @GetMapping("/available-math-functions")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<List<String>>> getAvailableMathFunctions() {
         logger.info("Получен запрос на получение списка доступных математических функций");
@@ -104,19 +105,6 @@ public class FunctionController {
             return ResponseEntity.ok(ApiResponse.success(mathFunctions));
         } catch (Exception e) {
             logger.error("Ошибка при получении списка математических функций: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
-        }
-    }
-
-    @GetMapping("/{functionId}")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public ResponseEntity<ApiResponse<FunctionDto>> getFunctionById(@PathVariable Integer functionId) {
-        logger.info("Получен запрос на получение функции с ID: {}", functionId);
-        try {
-            FunctionDto function = functionService.getFunctionById(functionId);
-            return ResponseEntity.ok(ApiResponse.success(function));
-        } catch (Exception e) {
-            logger.error("Ошибка при получении функции {}: {}", functionId, e.getMessage(), e);
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
@@ -161,7 +149,21 @@ public class FunctionController {
         }
     }
 
-    @PutMapping("/{functionId}/y-values")
+    // Маршруты с {functionId} должны быть в конце, чтобы не конфликтовать с другими маршрутами
+    @GetMapping("/by-id/{functionId}")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<FunctionDto>> getFunctionById(@PathVariable Integer functionId) {
+        logger.info("Получен запрос на получение функции с ID: {}", functionId);
+        try {
+            FunctionDto function = functionService.getFunctionById(functionId);
+            return ResponseEntity.ok(ApiResponse.success(function));
+        } catch (Exception e) {
+            logger.error("Ошибка при получении функции {}: {}", functionId, e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/by-id/{functionId}/y-values")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<FunctionDto>> updateYValues(
             @PathVariable Integer functionId,
@@ -177,7 +179,7 @@ public class FunctionController {
         }
     }
 
-    @PostMapping("/{functionId}/apply")
+    @PostMapping("/by-id/{functionId}/apply")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<ApplyResponse>> applyFunction(
             @PathVariable Integer functionId,
@@ -194,7 +196,7 @@ public class FunctionController {
         }
     }
 
-    @PostMapping("/{functionId}/insert-point")
+    @PostMapping("/by-id/{functionId}/insert-point")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<FunctionDto>> insertPoint(
             @PathVariable Integer functionId,
@@ -210,7 +212,7 @@ public class FunctionController {
         }
     }
 
-    @DeleteMapping("/{functionId}/remove-point/{index}")
+    @DeleteMapping("/by-id/{functionId}/remove-point/{index}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<ApiResponse<FunctionDto>> removePoint(
             @PathVariable Integer functionId,

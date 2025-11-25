@@ -23,6 +23,20 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser() {
+        logger.info("Получен запрос на получение текущего пользователя");
+        try {
+            UserDto user = userService.getCurrentUser();
+            logger.info("Текущий пользователь: {}", user.getUsername());
+            return ResponseEntity.ok(ApiResponse.success(user));
+        } catch (Exception e) {
+            logger.error("Ошибка при получении текущего пользователя: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
